@@ -1,6 +1,6 @@
 // SVG 차트 모음: 누적 막대, 단순 막대, 도넛, 인체 그림
 import { useState } from 'react'
-import { abbr, comma, pct } from '../lib/format'
+import { vol, comma, pct } from '../lib/format'
 
 export interface Seg {
   key: string
@@ -57,7 +57,7 @@ export function StackedBars({ bars, dim }: { bars: StackBar[]; dim: string | nul
               })}
               {total > 0 && (
                 <text x={cx} y={H - bottom - (total / max) * plotH - 5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#191f28">
-                  {abbr(total)}
+                  {vol(total)}
                 </text>
               )}
               {showLabel && (

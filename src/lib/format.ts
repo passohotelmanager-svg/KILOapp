@@ -4,12 +4,8 @@ export function comma(n: number): string {
   return Math.round(n).toLocaleString('ko-KR')
 }
 
-// 큰 볼륨 축약: 12,500 -> 12.5K (1,000 미만은 그대로)
-export function abbr(n: number): string {
-  if (n >= 1000) {
-    const v = Math.round(n / 100) / 10
-    return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}K`
-  }
+// 볼륨 표기: K 같은 축약 없이 숫자 그대로 (3500 -> 3500)
+export function vol(n: number): string {
   return String(Math.round(n))
 }
 

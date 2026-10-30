@@ -12,7 +12,7 @@ import {
   WEEK_HEADERS, addDays, addMonths, dayLabel, endOfMonth, isFuture, mdDash, mdLabel, monthLabel,
   parseYmd, startOfMonth, startOfWeek, weekLabel, ymd,
 } from '../lib/dates'
-import { abbr, comma, hm, mmss, pct } from '../lib/format'
+import { vol, comma, hm, mmss, pct } from '../lib/format'
 import { dailyTarget, sessionSeconds, tdee, type Aggregate } from '../lib/calc'
 import { agg, kcalOn, macrosOn, monthStat, recordedSessions, secondsByDay, workoutDays } from '../lib/stats'
 import { darken, lighten } from '../lib/color'
@@ -129,7 +129,7 @@ export function Analysis() {
         <Card title={`${today.getMonth() + 1}월 운동 현황`} onMore={() => nav.push('detail', { kind: 'month' })}>
           <div className="three">
             <div><Icon name="clock" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.seconds ? hm(mNow.seconds) : '-'}</div></div>
-            <div><Icon name="muscle" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? abbr(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
+            <div><Icon name="muscle" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? Math.round(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
             <div><Icon name="dumbbell" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.count || '-'}{mNow.count ? <small>회</small> : null}</div></div>
           </div>
         </Card>
@@ -138,9 +138,9 @@ export function Analysis() {
         <Card title="전월 대비" onMore={() => nav.push('detail', { kind: 'month' })}>
           <div className="two">
             <div><p className="muted">평균 운동 시간</p><div className="num" style={{ fontSize: 20 }}>{avgNow ? hm(avgNow) : '-'}</div></div>
-            <div><p className="muted">현재 볼륨 총합</p><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? abbr(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
+            <div><p className="muted">현재 볼륨 총합</p><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? vol(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
             <div><p className="muted">전월 대비 시간</p>{diff(avgNow, avgPrev, (n) => hm(n), '지난달 기록 없음')}</div>
-            <div><p className="muted">전월 대비 볼륨</p>{diff(mNow.volume, mPrev.volume, (n) => `${abbr(n)}kg`, '지난달 기록 없음')}</div>
+            <div><p className="muted">전월 대비 볼륨</p>{diff(mNow.volume, mPrev.volume, (n) => `${vol(n)}kg`, '지난달 기록 없음')}</div>
           </div>
         </Card>
 

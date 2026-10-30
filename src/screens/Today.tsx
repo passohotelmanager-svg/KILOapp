@@ -6,7 +6,7 @@ import { Card, Page, TopBar } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { MEALS, PART_NAME } from '../lib/constants'
 import { addDays, dayName, startOfWeek, ymd } from '../lib/dates'
-import { abbr, comma, hm } from '../lib/format'
+import { vol, comma, hm } from '../lib/format'
 import { dailyTarget } from '../lib/calc'
 import { agg, kcalOn, macrosOn, nutritionOn, recordedSessions, weekDoneCount, workoutDays } from '../lib/stats'
 import { sessionSeconds, setFilled } from '../lib/calc'
@@ -143,7 +143,7 @@ export function Today() {
           </Card>
           <Card title="볼륨 분석">
             <p className="muted">지난주 총 볼륨</p>
-            <div className="num mt8">{lastAgg.total ? abbr(lastAgg.total) : '-'}{lastAgg.total ? <small>kg</small> : null}</div>
+            <div className="num mt8">{lastAgg.total ? vol(lastAgg.total) : '-'}{lastAgg.total ? <small>kg</small> : null}</div>
             {!lastAgg.total && <p className="muted">지난주 기록 없음</p>}
           </Card>
           <Card title="칼로리">

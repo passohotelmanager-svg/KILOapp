@@ -6,7 +6,7 @@ import { Card, Page, Segmented, Sheet, Toggle, TopBar, useToast } from '../compo
 import { Icon } from '../components/Icon'
 import { ACTIVITY_LEVELS } from '../lib/constants'
 import { best1RM, sessionSeconds } from '../lib/calc'
-import { abbr, comma, hm } from '../lib/format'
+import { vol, comma, hm } from '../lib/format'
 import { mdLabel, parseYmd } from '../lib/dates'
 import { agg, recordedSessions } from '../lib/stats'
 import { requestNotifPermission } from '../lib/alarm'
@@ -78,7 +78,7 @@ export function Profile() {
         <Card title="업적">
           <div className="two">
             {tile('clock', '운동 시간', totalSec ? hm(totalSec) : '-')}
-            {tile('muscle', '총 볼륨', a.total ? `${abbr(a.total)}kg` : '-')}
+            {tile('muscle', '총 볼륨', a.total ? `${vol(a.total)}kg` : '-')}
             {tile('dumbbell', '총 운동 횟수', days.size ? `${days.size}회` : '-')}
             {tile('flame', '주간 스트릭', streak ? `${streak}주` : '-')}
           </div>

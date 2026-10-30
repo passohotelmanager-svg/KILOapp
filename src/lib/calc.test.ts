@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { abbr } from './format'
+import { vol } from './format'
 import { aggregate, bmr, buildAssist, dailyTarget, est1RM, macroKcal, setVolume, tdee } from './calc'
 import { startOfWeek, ymd, timeAgo } from './dates'
 import type { Exercise, Profile, Session } from '../types'
@@ -28,10 +28,10 @@ describe('볼륨', () => {
 })
 
 describe('표기', () => {
-  it('축약', () => {
-    expect(abbr(12500)).toBe('12.5K')
-    expect(abbr(999)).toBe('999')
-    expect(abbr(2000)).toBe('2K')
+  it('볼륨 표기', () => {
+    expect(vol(12500)).toBe('12500')
+    expect(vol(999)).toBe('999')
+    expect(vol(3500.4)).toBe('3500')
   })
   it('경과 시간', () => {
     const now = 1_000_000_000_000
