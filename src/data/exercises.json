@@ -1,0 +1,1802 @@
+[
+ {
+  "id": "chest-01",
+  "nameKo": "바벨 벤치프레스",
+  "nameEn": "Barbell Bench Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-02",
+  "nameKo": "덤벨 벤치프레스",
+  "nameEn": "Dumbbell Bench Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-03",
+  "nameKo": "인클라인 바벨 벤치프레스",
+  "nameEn": "Incline Barbell Bench Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-04",
+  "nameKo": "인클라인 덤벨 프레스",
+  "nameEn": "Incline Dumbbell Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-05",
+  "nameKo": "디클라인 바벨 벤치프레스",
+  "nameEn": "Decline Barbell Bench Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-06",
+  "nameKo": "디클라인 덤벨 프레스",
+  "nameEn": "Decline Dumbbell Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-07",
+  "nameKo": "스미스머신 벤치프레스",
+  "nameEn": "Smith Machine Bench Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-08",
+  "nameKo": "스미스머신 인클라인 프레스",
+  "nameEn": "Smith Machine Incline Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-09",
+  "nameKo": "체스트 프레스 머신",
+  "nameEn": "Chest Press Machine",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-10",
+  "nameKo": "인클라인 체스트 프레스 머신",
+  "nameEn": "Incline Chest Press Machine",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-11",
+  "nameKo": "펙덱 플라이",
+  "nameEn": "Pec Deck Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-12",
+  "nameKo": "덤벨 플라이",
+  "nameEn": "Dumbbell Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-13",
+  "nameKo": "인클라인 덤벨 플라이",
+  "nameEn": "Incline Dumbbell Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-14",
+  "nameKo": "디클라인 덤벨 플라이",
+  "nameEn": "Decline Dumbbell Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-15",
+  "nameKo": "케이블 크로스오버",
+  "nameEn": "Cable Crossover",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-16",
+  "nameKo": "로우 투 하이 케이블 플라이",
+  "nameEn": "Low-to-High Cable Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-17",
+  "nameKo": "하이 투 로우 케이블 플라이",
+  "nameEn": "High-to-Low Cable Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-18",
+  "nameKo": "싱글암 케이블 플라이",
+  "nameEn": "Single-Arm Cable Fly",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-19",
+  "nameKo": "가슴 딥스",
+  "nameEn": "Chest Dip",
+  "part": "chest",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "chest-20",
+  "nameKo": "어시스트 딥스 머신",
+  "nameEn": "Assisted Dip Machine",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-21",
+  "nameKo": "푸시업",
+  "nameEn": "Push-Up",
+  "part": "chest",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "chest-22",
+  "nameKo": "인클라인 푸시업",
+  "nameEn": "Incline Push-Up",
+  "part": "chest",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "chest-23",
+  "nameKo": "디클라인 푸시업",
+  "nameEn": "Decline Push-Up",
+  "part": "chest",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "chest-24",
+  "nameKo": "와이드 푸시업",
+  "nameEn": "Wide Push-Up",
+  "part": "chest",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "chest-25",
+  "nameKo": "덤벨 풀오버",
+  "nameEn": "Dumbbell Pullover",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-26",
+  "nameKo": "스퀴즈 프레스",
+  "nameEn": "Squeeze Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-27",
+  "nameKo": "랜드마인 프레스",
+  "nameEn": "Landmine Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-28",
+  "nameKo": "플로어 프레스",
+  "nameEn": "Floor Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-29",
+  "nameKo": "해머 스트렝스 체스트 프레스",
+  "nameEn": "Hammer Strength Chest Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "chest-30",
+  "nameKo": "케이블 체스트 프레스",
+  "nameEn": "Cable Chest Press",
+  "part": "chest",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-01",
+  "nameKo": "데드리프트",
+  "nameEn": "Deadlift",
+  "part": "back",
+  "subPart": "lower",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-02",
+  "nameKo": "랙 풀",
+  "nameEn": "Rack Pull",
+  "part": "back",
+  "subPart": "lower",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-03",
+  "nameKo": "풀업",
+  "nameEn": "Pull-Up",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "back-04",
+  "nameKo": "친업",
+  "nameEn": "Chin-Up",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "back-05",
+  "nameKo": "어시스트 풀업 머신",
+  "nameEn": "Assisted Pull-Up Machine",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-06",
+  "nameKo": "와이드그립 랫풀다운",
+  "nameEn": "Wide-Grip Lat Pulldown",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-07",
+  "nameKo": "클로즈그립 랫풀다운",
+  "nameEn": "Close-Grip Lat Pulldown",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-08",
+  "nameKo": "리버스그립 랫풀다운",
+  "nameEn": "Reverse-Grip Lat Pulldown",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-09",
+  "nameKo": "바벨 로우",
+  "nameEn": "Barbell Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-10",
+  "nameKo": "펜들레이 로우",
+  "nameEn": "Pendlay Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-11",
+  "nameKo": "언더그립 바벨 로우",
+  "nameEn": "Underhand Barbell Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-12",
+  "nameKo": "원암 덤벨 로우",
+  "nameEn": "One-Arm Dumbbell Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-13",
+  "nameKo": "체스트 서포티드 덤벨 로우",
+  "nameEn": "Chest-Supported Dumbbell Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-14",
+  "nameKo": "시티드 케이블 로우",
+  "nameEn": "Seated Cable Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-15",
+  "nameKo": "와이드그립 시티드 로우",
+  "nameEn": "Wide-Grip Seated Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-16",
+  "nameKo": "티바 로우",
+  "nameEn": "T-Bar Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-17",
+  "nameKo": "머신 로우",
+  "nameEn": "Machine Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-18",
+  "nameKo": "해머 스트렝스 하이 로우",
+  "nameEn": "Hammer Strength High Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-19",
+  "nameKo": "스트레이트 암 풀다운",
+  "nameEn": "Straight-Arm Pulldown",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-20",
+  "nameKo": "케이블 풀오버",
+  "nameEn": "Cable Pullover",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-21",
+  "nameKo": "싱글암 랫풀다운",
+  "nameEn": "Single-Arm Lat Pulldown",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-22",
+  "nameKo": "인버티드 로우",
+  "nameEn": "Inverted Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "back-23",
+  "nameKo": "백 익스텐션",
+  "nameEn": "Back Extension",
+  "part": "back",
+  "subPart": "lower",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "back-24",
+  "nameKo": "굿모닝",
+  "nameEn": "Good Morning",
+  "part": "back",
+  "subPart": "lower",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-25",
+  "nameKo": "메도우스 로우",
+  "nameEn": "Meadows Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-26",
+  "nameKo": "실 로우",
+  "nameEn": "Seal Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-27",
+  "nameKo": "케이블 원암 로우",
+  "nameEn": "Cable One-Arm Row",
+  "part": "back",
+  "subPart": "lats_mid",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-28",
+  "nameKo": "바벨 슈러그",
+  "nameEn": "Barbell Shrug",
+  "part": "back",
+  "subPart": "traps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-29",
+  "nameKo": "덤벨 슈러그",
+  "nameEn": "Dumbbell Shrug",
+  "part": "back",
+  "subPart": "traps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "back-30",
+  "nameKo": "케이블 슈러그",
+  "nameEn": "Cable Shrug",
+  "part": "back",
+  "subPart": "traps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-01",
+  "nameKo": "바벨 오버헤드 프레스",
+  "nameEn": "Barbell Overhead Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-02",
+  "nameKo": "시티드 바벨 숄더프레스",
+  "nameEn": "Seated Barbell Shoulder Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-03",
+  "nameKo": "덤벨 숄더프레스",
+  "nameEn": "Dumbbell Shoulder Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-04",
+  "nameKo": "아놀드 프레스",
+  "nameEn": "Arnold Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-05",
+  "nameKo": "스미스머신 숄더프레스",
+  "nameEn": "Smith Machine Shoulder Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-06",
+  "nameKo": "숄더프레스 머신",
+  "nameEn": "Shoulder Press Machine",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-07",
+  "nameKo": "푸시 프레스",
+  "nameEn": "Push Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-08",
+  "nameKo": "비하인드 넥 프레스",
+  "nameEn": "Behind-the-Neck Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-09",
+  "nameKo": "덤벨 사이드 레터럴 레이즈",
+  "nameEn": "Dumbbell Lateral Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-10",
+  "nameKo": "케이블 사이드 레터럴 레이즈",
+  "nameEn": "Cable Lateral Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-11",
+  "nameKo": "머신 레터럴 레이즈",
+  "nameEn": "Machine Lateral Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-12",
+  "nameKo": "린 어웨이 레터럴 레이즈",
+  "nameEn": "Lean-Away Lateral Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-13",
+  "nameKo": "덤벨 프론트 레이즈",
+  "nameEn": "Dumbbell Front Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-14",
+  "nameKo": "바벨 프론트 레이즈",
+  "nameEn": "Barbell Front Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-15",
+  "nameKo": "케이블 프론트 레이즈",
+  "nameEn": "Cable Front Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-16",
+  "nameKo": "플레이트 프론트 레이즈",
+  "nameEn": "Plate Front Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-17",
+  "nameKo": "벤트오버 리어델트 레이즈",
+  "nameEn": "Bent-Over Rear Delt Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-18",
+  "nameKo": "리버스 펙덱 플라이",
+  "nameEn": "Reverse Pec Deck Fly",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-19",
+  "nameKo": "케이블 리어델트 플라이",
+  "nameEn": "Cable Rear Delt Fly",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-20",
+  "nameKo": "페이스 풀",
+  "nameEn": "Face Pull",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-21",
+  "nameKo": "바벨 업라이트 로우",
+  "nameEn": "Barbell Upright Row",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-22",
+  "nameKo": "케이블 업라이트 로우",
+  "nameEn": "Cable Upright Row",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-23",
+  "nameKo": "덤벨 업라이트 로우",
+  "nameEn": "Dumbbell Upright Row",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-24",
+  "nameKo": "Y 레이즈",
+  "nameEn": "Y Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-25",
+  "nameKo": "싱글암 랜드마인 프레스",
+  "nameEn": "Single-Arm Landmine Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-26",
+  "nameKo": "파이크 푸시업",
+  "nameEn": "Pike Push-Up",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-27",
+  "nameKo": "핸드스탠드 푸시업",
+  "nameEn": "Handstand Push-Up",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-28",
+  "nameKo": "쿠반 프레스",
+  "nameEn": "Cuban Press",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-29",
+  "nameKo": "인클라인 리어델트 레이즈",
+  "nameEn": "Incline Rear Delt Raise",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "shoulders-30",
+  "nameKo": "케이블 외회전",
+  "nameEn": "Cable External Rotation",
+  "part": "shoulders",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-01",
+  "nameKo": "바벨 백스쿼트",
+  "nameEn": "Barbell Back Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-02",
+  "nameKo": "프론트 스쿼트",
+  "nameEn": "Front Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-03",
+  "nameKo": "고블릿 스쿼트",
+  "nameEn": "Goblet Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-04",
+  "nameKo": "스미스머신 스쿼트",
+  "nameEn": "Smith Machine Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-05",
+  "nameKo": "핵 스쿼트",
+  "nameEn": "Hack Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-06",
+  "nameKo": "레그 프레스",
+  "nameEn": "Leg Press",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-07",
+  "nameKo": "펜듈럼 스쿼트",
+  "nameEn": "Pendulum Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-08",
+  "nameKo": "불가리안 스플릿 스쿼트",
+  "nameEn": "Bulgarian Split Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-09",
+  "nameKo": "덤벨 런지",
+  "nameEn": "Dumbbell Lunge",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-10",
+  "nameKo": "워킹 런지",
+  "nameEn": "Walking Lunge",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-11",
+  "nameKo": "리버스 런지",
+  "nameEn": "Reverse Lunge",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-12",
+  "nameKo": "스텝업",
+  "nameEn": "Step-Up",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-13",
+  "nameKo": "레그 익스텐션",
+  "nameEn": "Leg Extension",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-14",
+  "nameKo": "라잉 레그 컬",
+  "nameEn": "Lying Leg Curl",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-15",
+  "nameKo": "시티드 레그 컬",
+  "nameEn": "Seated Leg Curl",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-16",
+  "nameKo": "루마니안 데드리프트",
+  "nameEn": "Romanian Deadlift",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-17",
+  "nameKo": "스티프 레그 데드리프트",
+  "nameEn": "Stiff-Leg Deadlift",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-18",
+  "nameKo": "스모 데드리프트",
+  "nameEn": "Sumo Deadlift",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-19",
+  "nameKo": "바벨 힙 쓰러스트",
+  "nameEn": "Barbell Hip Thrust",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-20",
+  "nameKo": "글루트 브릿지",
+  "nameEn": "Glute Bridge",
+  "part": "legs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "legs-21",
+  "nameKo": "케이블 글루트 킥백",
+  "nameEn": "Cable Glute Kickback",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-22",
+  "nameKo": "힙 어브덕션 머신",
+  "nameEn": "Hip Abduction Machine",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-23",
+  "nameKo": "힙 어덕션 머신",
+  "nameEn": "Hip Adduction Machine",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-24",
+  "nameKo": "스탠딩 카프 레이즈",
+  "nameEn": "Standing Calf Raise",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-25",
+  "nameKo": "시티드 카프 레이즈",
+  "nameEn": "Seated Calf Raise",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-26",
+  "nameKo": "레그프레스 카프 레이즈",
+  "nameEn": "Leg Press Calf Raise",
+  "part": "legs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "legs-27",
+  "nameKo": "노르딕 햄스트링 컬",
+  "nameEn": "Nordic Hamstring Curl",
+  "part": "legs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "legs-28",
+  "nameKo": "시시 스쿼트",
+  "nameEn": "Sissy Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "legs-29",
+  "nameKo": "박스 점프",
+  "nameEn": "Box Jump",
+  "part": "legs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "legs-30",
+  "nameKo": "맨몸 스쿼트",
+  "nameEn": "Bodyweight Squat",
+  "part": "legs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "arms-01",
+  "nameKo": "바벨 컬",
+  "nameEn": "Barbell Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-02",
+  "nameKo": "EZ바 컬",
+  "nameEn": "EZ-Bar Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-03",
+  "nameKo": "덤벨 컬",
+  "nameEn": "Dumbbell Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-04",
+  "nameKo": "해머 컬",
+  "nameEn": "Hammer Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-05",
+  "nameKo": "인클라인 덤벨 컬",
+  "nameEn": "Incline Dumbbell Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-06",
+  "nameKo": "프리처 컬",
+  "nameEn": "Preacher Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-07",
+  "nameKo": "컨센트레이션 컬",
+  "nameEn": "Concentration Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-08",
+  "nameKo": "케이블 컬",
+  "nameEn": "Cable Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-09",
+  "nameKo": "머신 컬",
+  "nameEn": "Machine Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-10",
+  "nameKo": "스파이더 컬",
+  "nameEn": "Spider Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-11",
+  "nameKo": "드래그 컬",
+  "nameEn": "Drag Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-12",
+  "nameKo": "베이시언 케이블 컬",
+  "nameEn": "Bayesian Cable Curl",
+  "part": "arms",
+  "subPart": "biceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-13",
+  "nameKo": "클로즈그립 벤치프레스",
+  "nameEn": "Close-Grip Bench Press",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-14",
+  "nameKo": "스컬 크러셔",
+  "nameEn": "Skull Crusher",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-15",
+  "nameKo": "바 푸시다운",
+  "nameEn": "Bar Pushdown",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-16",
+  "nameKo": "로프 푸시다운",
+  "nameEn": "Rope Pushdown",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-17",
+  "nameKo": "오버헤드 덤벨 익스텐션",
+  "nameEn": "Overhead Dumbbell Extension",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-18",
+  "nameKo": "오버헤드 케이블 익스텐션",
+  "nameEn": "Overhead Cable Extension",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-19",
+  "nameKo": "덤벨 킥백",
+  "nameEn": "Dumbbell Kickback",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-20",
+  "nameKo": "케이블 트라이셉스 킥백",
+  "nameEn": "Cable Triceps Kickback",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-21",
+  "nameKo": "벤치 딥스",
+  "nameEn": "Bench Dip",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "arms-22",
+  "nameKo": "삼두 딥스",
+  "nameEn": "Triceps Dip",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "arms-23",
+  "nameKo": "다이아몬드 푸시업",
+  "nameEn": "Diamond Push-Up",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "arms-24",
+  "nameKo": "JM 프레스",
+  "nameEn": "JM Press",
+  "part": "arms",
+  "subPart": "triceps",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-25",
+  "nameKo": "리버스 컬",
+  "nameEn": "Reverse Curl",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-26",
+  "nameKo": "리스트 컬",
+  "nameEn": "Wrist Curl",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-27",
+  "nameKo": "리버스 리스트 컬",
+  "nameEn": "Reverse Wrist Curl",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-28",
+  "nameKo": "리스트 롤러",
+  "nameEn": "Wrist Roller",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "arms-29",
+  "nameKo": "파머스 워크",
+  "nameEn": "Farmer's Walk",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "arms-30",
+  "nameKo": "플레이트 핀치",
+  "nameEn": "Plate Pinch",
+  "part": "arms",
+  "subPart": "forearms",
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "abs-01",
+  "nameKo": "크런치",
+  "nameEn": "Crunch",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-02",
+  "nameKo": "리버스 크런치",
+  "nameEn": "Reverse Crunch",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-03",
+  "nameKo": "싯업",
+  "nameEn": "Sit-Up",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-04",
+  "nameKo": "레그 레이즈",
+  "nameEn": "Leg Raise",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-05",
+  "nameKo": "행잉 레그 레이즈",
+  "nameEn": "Hanging Leg Raise",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-06",
+  "nameKo": "행잉 니 레이즈",
+  "nameEn": "Hanging Knee Raise",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-07",
+  "nameKo": "캡틴스 체어 레그 레이즈",
+  "nameEn": "Captain's Chair Leg Raise",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-08",
+  "nameKo": "케이블 크런치",
+  "nameEn": "Cable Crunch",
+  "part": "abs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "abs-09",
+  "nameKo": "앱 크런치 머신",
+  "nameEn": "Ab Crunch Machine",
+  "part": "abs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "abs-10",
+  "nameKo": "플랭크",
+  "nameEn": "Plank",
+  "part": "abs",
+  "subPart": null,
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "abs-11",
+  "nameKo": "사이드 플랭크",
+  "nameEn": "Side Plank",
+  "part": "abs",
+  "subPart": null,
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "abs-12",
+  "nameKo": "러시안 트위스트",
+  "nameEn": "Russian Twist",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-13",
+  "nameKo": "바이시클 크런치",
+  "nameEn": "Bicycle Crunch",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-14",
+  "nameKo": "마운틴 클라이머",
+  "nameEn": "Mountain Climber",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-15",
+  "nameKo": "V업",
+  "nameEn": "V-Up",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-16",
+  "nameKo": "토즈 투 바",
+  "nameEn": "Toes-to-Bar",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-17",
+  "nameKo": "앱 롤아웃",
+  "nameEn": "Ab Rollout",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-18",
+  "nameKo": "데드버그",
+  "nameEn": "Dead Bug",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-19",
+  "nameKo": "버드독",
+  "nameEn": "Bird Dog",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-20",
+  "nameKo": "할로우 바디 홀드",
+  "nameEn": "Hollow Body Hold",
+  "part": "abs",
+  "subPart": null,
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "abs-21",
+  "nameKo": "디클라인 싯업",
+  "nameEn": "Decline Sit-Up",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-22",
+  "nameKo": "케이블 우드찹",
+  "nameEn": "Cable Woodchop",
+  "part": "abs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "abs-23",
+  "nameKo": "팔로프 프레스",
+  "nameEn": "Pallof Press",
+  "part": "abs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "abs-24",
+  "nameKo": "플러터 킥",
+  "nameEn": "Flutter Kick",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-25",
+  "nameKo": "시저 킥",
+  "nameEn": "Scissor Kick",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-26",
+  "nameKo": "힐 터치",
+  "nameEn": "Heel Touch",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-27",
+  "nameKo": "드래곤 플래그",
+  "nameEn": "Dragon Flag",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-28",
+  "nameKo": "오블리크 크런치",
+  "nameEn": "Oblique Crunch",
+  "part": "abs",
+  "subPart": null,
+  "type": "bodyweight",
+  "builtin": true
+ },
+ {
+  "id": "abs-29",
+  "nameKo": "덤벨 사이드 벤드",
+  "nameEn": "Dumbbell Side Bend",
+  "part": "abs",
+  "subPart": null,
+  "type": "weight",
+  "builtin": true
+ },
+ {
+  "id": "abs-30",
+  "nameKo": "L싯",
+  "nameEn": "L-Sit",
+  "part": "abs",
+  "subPart": null,
+  "type": "time",
+  "builtin": true
+ },
+ {
+  "id": "cardio-01",
+  "nameKo": "러닝머신 달리기",
+  "nameEn": "Treadmill Run",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-02",
+  "nameKo": "러닝머신 걷기",
+  "nameEn": "Treadmill Walk",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-03",
+  "nameKo": "인클라인 걷기",
+  "nameEn": "Incline Treadmill Walk",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-04",
+  "nameKo": "야외 달리기",
+  "nameEn": "Outdoor Run",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-05",
+  "nameKo": "야외 걷기",
+  "nameEn": "Outdoor Walk",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-06",
+  "nameKo": "실내 사이클",
+  "nameEn": "Stationary Bike",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-07",
+  "nameKo": "스피닝",
+  "nameEn": "Spin Bike",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-08",
+  "nameKo": "리컴번트 사이클",
+  "nameEn": "Recumbent Bike",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-09",
+  "nameKo": "야외 자전거",
+  "nameEn": "Outdoor Cycling",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-10",
+  "nameKo": "일립티컬",
+  "nameEn": "Elliptical",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-11",
+  "nameKo": "로잉머신",
+  "nameEn": "Rowing Machine",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-12",
+  "nameKo": "스키 에르그",
+  "nameEn": "SkiErg",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-13",
+  "nameKo": "에어 바이크",
+  "nameEn": "Air Bike",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-14",
+  "nameKo": "수영",
+  "nameEn": "Swimming",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-15",
+  "nameKo": "등산",
+  "nameEn": "Hiking",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_distance",
+  "builtin": true
+ },
+ {
+  "id": "cardio-16",
+  "nameKo": "천국의 계단",
+  "nameEn": "Stair Climber",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_time",
+  "builtin": true
+ },
+ {
+  "id": "cardio-17",
+  "nameKo": "스텝밀",
+  "nameEn": "StepMill",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_time",
+  "builtin": true
+ },
+ {
+  "id": "cardio-18",
+  "nameKo": "줄넘기",
+  "nameEn": "Jump Rope",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_time",
+  "builtin": true
+ },
+ {
+  "id": "cardio-19",
+  "nameKo": "버피",
+  "nameEn": "Burpee",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_time",
+  "builtin": true
+ },
+ {
+  "id": "cardio-20",
+  "nameKo": "배틀 로프",
+  "nameEn": "Battle Rope",
+  "part": "cardio",
+  "subPart": null,
+  "type": "cardio_time",
+  "builtin": true
+ }
+]

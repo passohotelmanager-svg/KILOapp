@@ -1,0 +1,47 @@
+# 비밀값, 로컬 환경 파일 (절대 커밋 금지)
+.env
+.env.*
+!.env.example
+**/.env
+.secret.local
+**/.secret.local
+*-service-account*.json
+*service-account*.json
+serviceAccountKey*.json
+*.pem
+*.p12
+*.keystore
+*.jks
+key.properties
+
+# Supabase 로컬 캐시 (supabase/functions/.env 는 위 **/.env 로 제외됨)
+supabase/.temp/
+supabase/.branches/
+
+# Node (React 시안)
+node_modules/
+dist/
+*.log
+
+# Flutter (Supabase 접속 정보는 환경별로 따로 둔다. 예시는 supabase.example.json)
+kilo_app/supabase.json
+kilo_app/.dart_tool/
+kilo_app/build/
+kilo_app/.flutter-plugins
+kilo_app/.flutter-plugins-dependencies
+kilo_app/android/local.properties
+kilo_app/ios/Flutter/Generated.xcconfig
+kilo_app/ios/Pods/
+
+# 편집기
+.idea/
+.vscode/
+.DS_Store
+
+# Supabase 접속 정보
+supabase.json
+**/supabase.json
+
+# Flutter SDK (별도 저장소), 개발 서버 로그
+/flutter/
+dev.log
