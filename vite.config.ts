@@ -68,5 +68,6 @@ function developerVolumeApi(): Plugin {
 
 export default defineConfig({
   plugins: [react(), developerVolumeApi()],
-  test: { environment: 'node' },
+  // 서버 함수 테스트(supabase/functions)는 node:test 방식이라 npm run test:functions로 따로 돌린다
+  test: { environment: 'node', include: ['src/**/*.test.ts'] },
 })

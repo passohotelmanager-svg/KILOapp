@@ -45,3 +45,9 @@ supabase.json
 # Flutter SDK (별도 저장소), 개발 서버 로그
 /flutter/
 dev.log
+
+# 기타 로컬 파일
+.claude/
+coverage/
+*.tsbuildinfo
+Thumbs.db

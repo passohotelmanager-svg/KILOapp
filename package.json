@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
+    "test:functions": "node --test \"supabase/functions/_shared/*.test.ts\"",
     "seed": "node scripts/build-seed.mjs"
   },
   "dependencies": {

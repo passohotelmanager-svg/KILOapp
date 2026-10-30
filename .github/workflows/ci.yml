@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 기본 권한은 읽기만. 비밀값은 사용하지 않는다.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: 웹앱 (타입 검사, 빌드, 테스트)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: 타입 검사와 빌드
+        run: npm run build
+      - name: 단위 테스트
+        run: npm test
+      - name: 서버 함수 테스트
+        run: npm run test:functions
+
+  flutter:
+    name: Flutter 앱 (분석, 테스트)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kilo_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
