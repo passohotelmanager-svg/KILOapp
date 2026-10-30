@@ -5,7 +5,7 @@ export type PartCode = 'chest' | 'back' | 'shoulders' | 'legs' | 'arms' | 'abs' 
 export type SubPartCode = 'lats_mid' | 'lower' | 'traps' | 'biceps' | 'triceps' | 'forearms'
 export type RecordType = 'weight' | 'bodyweight' | 'time' | 'cardio_distance' | 'cardio_time'
 export type MealCode = 'breakfast' | 'lunch' | 'dinner' | 'snack'
-export type Provider = 'google' | 'facebook' | 'apple'
+export type Provider = 'google' | 'facebook' | 'apple' | 'email'
 export type Goal = 'lose' | 'strength' | 'health'
 export type Sex = 'male' | 'female'
 export type NameLang = 'ko' | 'en' | 'both'
@@ -140,4 +140,7 @@ export interface AppState {
   comments: Comment[]
   blocks: string[]
   lastReminderDate: string
+  // 서버 저장: 마지막으로 바뀐 시각(ms)과, 이 기기의 데이터가 어느 계정의 것인지
+  updatedAt: number
+  syncedUserId: string | null
 }

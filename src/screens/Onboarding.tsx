@@ -1,18 +1,19 @@
 // 온보딩 10단계 (PRD 7.3)
 import { tr } from '../lib/i18n'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { actions, nicknameTaken, useAppState } from '../store'
 import { Icon } from '../components/Icon'
 import { Wheel, useToast } from '../components/ui'
 import { WEEKLY_HINT } from '../lib/constants'
 import { activityFromWeekly } from '../lib/calc'
 import { requestNotifPermission } from '../lib/alarm'
+import { claimNickname, nicknameAvailable } from '../lib/cloud'
+import { authEnabled, sendPasswordReset, signInWithEmail, signInWithProvider, signUpWithEmail, type AuthFail, type AuthProvider } from '../lib/auth'
 import type { Goal, Profile, Provider, Sex } from '../types'
 
 const range = (a: number, b: number, fmt: (n: number) => string = String) =>
   Array.from({ length: b - a + 1 }, (_, i) => ({ value: a + i, label: fmt(a + i) }))
 
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 
 function Back({ onBack }: { onBack: () => void }) {
   return (
@@ -36,7 +37,23 @@ function Footer({ label, disabled, onClick }: { label: string; disabled?: boolea
 
 export function Onboarding() {
   const s = useAppState()
-  const [step, setStep] = useState(s.user && !s.user.nickname && s.profile ? 10 : 1)
+  const [stepState, setStep] = useState(1)
+  // 로그인이 끝나 계정이 생기면(로그인 창에서 돌아온 경우 포함) 닉네임 단계로 간다
+  const needNickname = !!s.user && !s.user.nickname && !!s.profile
+  const step = needNickname ? 10 : stepState
+
+  // 이미 계정이 있는 사람이 로그인하면(이 기기에 정보가 없으면) 몸 정보를 묻는 단계로 보낸다
+  useEffect(() => {
+    if (s.user && !s.profile && (stepState === 1 || stepState === 11)) setStep(2)
+  }, [s.user, s.profile, stepState])
+  // 몸 정보를 다 묻고 로그인 단계에 왔는데 이미 로그인돼 있으면 로그인을 건너뛴다
+  useEffect(() => {
+    if (stepState === 9 && s.user && !s.onboarded) setStep(10)
+  }, [stepState, s.user, s.onboarded])
+  // 계정에 닉네임이 이미 있으면 닉네임 단계를 건너뛰고 바로 시작한다
+  useEffect(() => {
+    if (step === 10 && s.user?.nickname && !s.onboarded) actions.completeOnboarding(profile())
+  }, [step, s.user, s.onboarded]) // eslint-disable-line react-hooks/exhaustive-deps
   const [goal, setGoal] = useState<Goal | null>(null)
   const [weekly, setWeekly] = useState(3)
   const [y, setY] = useState(1995)
@@ -47,6 +64,11 @@ export function Onboarding() {
   const [kgInt, setKgInt] = useState(65)
   const [kgDec, setKgDec] = useState(0)
   const [nick, setNick] = useState('')
+  const [email, setEmail] = useState('')
+  const [pw, setPw] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [serverTaken, setServerTaken] = useState(false)
   const [toast, show] = useToast()
 
   const thisYear = new Date().getFullYear()
@@ -66,15 +88,72 @@ export function Onboarding() {
     activity: activityFromWeekly(weekly),
   })
 
-  const login = (p: Provider) => {
-    actions.login(p)
-    setStep(10)
+  const login = async (p: Provider) => {
+    if (!authEnabled) {
+      actions.login(p)
+      setStep(10)
+      return
+    }
+    if (p !== 'google' && p !== 'apple') return
+    // 로그인 창에 갔다 돌아오면 이 화면의 입력값이 사라지므로, 지금까지 입력한 정보를 먼저 저장해 둔다
+    actions.completeOnboarding(profile())
+    const err = await signInWithProvider(p as AuthProvider)
+    if (err) show(tr('로그인을 시작하지 못했어요. 잠시 후 다시 시도해주세요'))
+  }
+
+  // 닉네임을 입력하면 서버에서 중복을 확인한다 (입력이 멈춘 뒤 0.4초)
+  useEffect(() => {
+    const t = nick.trim()
+    setServerTaken(false)
+    if (!authEnabled || step !== 10 || t.length < 2 || t.length > 12) return
+    const h = window.setTimeout(async () => {
+      const r = await nicknameAvailable(t)
+      if (r.ok) setServerTaken(!r.value)
+    }, 400)
+    return () => window.clearTimeout(h)
+  }, [nick, step])
+
+  const failText = (f: AuthFail): string =>
+    ({
+      invalid: tr('이메일 또는 비밀번호가 맞지 않아요'),
+      unconfirmed: tr('메일 확인이 아직 안 됐어요. 받은 메일의 링크를 눌러주세요'),
+      exists: tr('이미 가입된 이메일이에요. 로그인해주세요'),
+      rate: tr('요청이 너무 많아요. 잠시 후 다시 시도해주세요'),
+      weak: tr('비밀번호가 너무 약해요'),
+      off: tr('이메일 로그인을 사용할 수 없어요'),
+      unknown: tr('실패했어요. 잠시 후 다시 시도해주세요'),
+    })[f]
+
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const submitEmail = async (kind: 'signup' | 'login') => {
+    if (!emailOk) return setMsg(tr('이메일 주소를 확인해주세요'))
+    if (pw.length < 8) return setMsg(tr('비밀번호는 8자 이상이에요'))
+    setBusy(true)
+    setMsg('')
+    if (kind === 'signup') {
+      // 확인 메일 링크로 돌아와도 지금까지 입력한 정보가 남도록 먼저 저장해 둔다
+      actions.completeOnboarding(profile())
+      const r = await signUpWithEmail(email.trim(), pw)
+      if (r.fail) setMsg(failText(r.fail))
+      else if (r.needsConfirm) setMsg(tr('확인 메일을 보냈어요. 메일의 링크를 누르면 로그인돼요'))
+    } else {
+      const f = await signInWithEmail(email.trim(), pw)
+      if (f) setMsg(failText(f))
+    }
+    setBusy(false)
+  }
+  const forgot = async () => {
+    if (!emailOk) return setMsg(tr('이메일 주소를 먼저 입력해주세요'))
+    setBusy(true)
+    const f = await sendPasswordReset(email.trim())
+    setMsg(f ? failText(f) : tr('비밀번호 재설정 메일을 보냈어요'))
+    setBusy(false)
   }
 
   const nickErr = (() => {
     const t = nick.trim()
     if (t.length > 0 && (t.length < 2 || t.length > 12)) return tr('2~12자로 입력해주세요')
-    if (t && nicknameTaken(s, t)) return tr('이미 사용 중인 닉네임이에요')
+    if (t && (nicknameTaken(s, t) || serverTaken)) return tr('이미 사용 중인 닉네임이에요')
     return ''
   })()
 
@@ -103,7 +182,7 @@ export function Onboarding() {
           <button
             className="link mt16"
             style={{ background: 'none' }}
-            onClick={() => show(tr('이 기기에는 저장된 계정이 없어요. 시작하기로 새로 만들어주세요'))}
+            onClick={() => (authEnabled ? setStep(11) : show(tr('이 기기에는 저장된 계정이 없어요. 시작하기로 새로 만들어주세요')))}
           >
             
             {tr('이미 계정이 있어요')}
@@ -255,20 +334,38 @@ export function Onboarding() {
     )
   }
 
-  if (step === 9) {
-    const btn = (p: Provider, label: string) => (
-      <button className="btn line" style={{ marginBottom: 10 }} onClick={() => login(p)}>
-        {label}
+  if (step === 9 || step === 11) {
+    const signup = step === 9
+    const googleBtn = (
+      <button className="btn line" style={{ marginBottom: 10 }} onClick={() => login('google')}>
+        {tr('Google로 계속하기')}
       </button>
     )
     return shell(
       <>
-        <h1 className="h1">{tr('로그인하고')}<br />{tr('기록을 시작해요')}</h1>
-        <p className="sub">{tr('이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요')}</p>
+        <h1 className="h1">{signup ? <>{tr('로그인하고')}<br />{tr('기록을 시작해요')}</> : <>{tr('다시 만나서')}<br />{tr('반가워요')}</>}</h1>
+        <p className="sub">{authEnabled ? tr('Google 계정 또는 이메일로 {0}해요', [signup ? tr('가입') : tr('로그인')]) : tr('이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요')}</p>
         <div className="mt24">
-          {btn('google', tr('Google로 계속하기'))}
-          {btn('facebook', tr('Facebook으로 계속하기'))}
-          {isIOS && btn('apple', tr('Apple로 계속하기'))}
+          {googleBtn}
+          {authEnabled && (
+            <>
+              <p className="sub center" style={{ margin: '14px 0' }}>{tr('또는')}</p>
+              <input className="input" type="email" autoComplete="email" inputMode="email" placeholder={tr('이메일')} value={email} onChange={(e) => setEmail(e.target.value)} aria-label={tr('이메일')} />
+              <input className="input mt8" type="password" autoComplete={signup ? 'new-password' : 'current-password'} placeholder={signup ? tr('비밀번호 (8자 이상)') : tr('비밀번호')} value={pw} onChange={(e) => setPw(e.target.value)} aria-label={tr('비밀번호')} />
+              {msg && <p className="sub" style={{ color: 'var(--dec)', marginTop: 10 }} role="status">{msg}</p>}
+              <button className="btn mt16" disabled={busy || !email || !pw} onClick={() => submitEmail(signup ? 'signup' : 'login')}>
+                {signup ? tr('이메일로 회원가입') : tr('이메일로 로그인')}
+              </button>
+              {!signup && (
+                <button className="link mt16" style={{ display: 'block', margin: '16px auto 0', background: 'none' }} disabled={busy} onClick={forgot}>
+                  {tr('비밀번호를 잊었어요')}
+                </button>
+              )}
+              <button className="link" style={{ display: 'block', margin: '12px auto 0', background: 'none' }} onClick={() => { setMsg(''); setStep(signup ? 11 : 2) }}>
+                {signup ? tr('이미 계정이 있어요') : tr('처음이에요. 회원가입할게요')}
+              </button>
+            </>
+          )}
         </div>
       </>,
     )
@@ -287,7 +384,13 @@ export function Onboarding() {
     <Footer
       label={tr('시작하기')}
       disabled={!ok}
-      onClick={() => {
+      onClick={async () => {
+        // 로그인한 계정이면 서버에 먼저 등록한다. 서버가 같은 닉네임을 한 명에게만 허락한다
+        if (authEnabled && s.user && !s.user.id.startsWith('me-')) {
+          const r = await claimNickname(s.user.id, t)
+          if (!r.ok && r.reason === 'taken') return setServerTaken(true)
+          if (!r.ok && r.reason === 'invalid') return show(tr('쓸 수 없는 닉네임이에요'))
+        }
         actions.setNickname(t)
         actions.completeOnboarding(profile())
       }}

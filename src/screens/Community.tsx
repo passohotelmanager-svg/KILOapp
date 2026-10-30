@@ -3,7 +3,8 @@ import { tr } from '../lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { actions, useAppState } from '../store'
 import { Sheet, TopBar, useLongPress, useToast } from '../components/ui'
-import { timeAgo } from '../lib/dates'
+import { monthLabel, timeAgo } from '../lib/dates'
+import { authEnabled } from '../lib/auth'
 import type { Comment } from '../types'
 
 function Bubble({ c, mine, now, onMenu }: { c: Comment; mine: boolean; now: number; onMenu: (c: Comment) => void }) {
@@ -25,6 +26,7 @@ export function Community() {
   const [now, setNow] = useState(Date.now())
   const [menu, setMenu] = useState<Comment | null>(null)
   const [visible, setVisible] = useState(30)
+  const [sending, setSending] = useState(false)
   const [toast, show] = useToast()
   const box = useRef<HTMLDivElement>(null)
   const me = s.user?.id
@@ -46,9 +48,14 @@ export function Community() {
     if (box.current) box.current.scrollTop = box.current.scrollHeight
   }, [lastId])
 
-  const submit = () => {
-    const r = actions.postComment(text)
+  const submit = async () => {
+    if (sending) return
+    setSending(true)
+    const r = await actions.postComment(text)
+    setSending(false)
     if (r === 'ok') setText('')
+    else if (r === 'rate') show(tr('너무 빨리 보내고 있어요. 잠시 후 다시 시도해주세요'))
+    else if (r === 'failed') show(tr('보내지 못했어요. 잠시 후 다시 시도해주세요'))
     else if (r === 'banned') show(tr('사용할 수 없는 표현이 포함되어 있어요'))
     else if (r === 'long') show(tr('100자까지 쓸 수 있어요'))
     else if (r === 'nouser') show(tr('로그인 후 작성할 수 있어요'))
@@ -57,6 +64,9 @@ export function Community() {
   return (
     <>
       <TopBar title={tr('커뮤니티')} />
+      {authEnabled && !!s.user && !s.user.id.startsWith('me-') && (
+        <p className="muted center" style={{ fontSize: 12, margin: '0 0 6px' }}>{tr('{0} 대화예요 · 매달 1일에 새로 시작해요', [monthLabel(new Date())])}</p>
+      )}
       <div
         className="chat"
         ref={box}

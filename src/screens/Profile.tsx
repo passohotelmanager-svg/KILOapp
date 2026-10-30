@@ -11,6 +11,9 @@ import { vol, comma, hm } from '../lib/format'
 import { mdLabel, parseYmd } from '../lib/dates'
 import { agg, recordedSessions } from '../lib/stats'
 import { requestNotifPermission } from '../lib/alarm'
+import { authEnabled, changePassword } from '../lib/auth'
+import { claimNickname, deleteMyAccount } from '../lib/cloud'
+import { logoutAndClear, useSyncStatus } from '../lib/sync'
 import { NAME_LANG_OPTIONS } from './Picker'
 import type { Provider } from '../types'
 
@@ -259,12 +262,44 @@ export function Settings() {
   const DAYS = [tr('일'), tr('월'), tr('화'), tr('수'), tr('목'), tr('금'), tr('토')]
   const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // 월요일부터 표시 (값은 Date.getDay 기준)
 
-  const saveNick = () => {
+  const realUser = authEnabled && !!s.user && !s.user.id.startsWith('me-')
+  const sync = useSyncStatus()
+  const [delEmail, setDelEmail] = useState('')
+  const [delBusy, setDelBusy] = useState(false)
+  const delOk = !realUser || delEmail.trim().toLowerCase() === (s.user?.email ?? '').toLowerCase()
+
+  const saveNick = async () => {
     const t = nick.trim()
     if (t.length < 2 || t.length > 12) return show(tr('닉네임은 2~12자로 입력해주세요'))
-    if (t !== s.user?.nickname && nicknameTaken(s, t)) return show(tr('이미 사용 중인 닉네임이에요'))
+    if (t === s.user?.nickname) return
+    if (nicknameTaken(s, t)) return show(tr('이미 사용 중인 닉네임이에요'))
+    // 로그인한 계정이면 서버에서 중복을 확인하고 저장한다
+    if (realUser && s.user) {
+      const r = await claimNickname(s.user.id, t)
+      if (!r.ok && r.reason === 'taken') return show(tr('이미 사용 중인 닉네임이에요'))
+      if (!r.ok && r.reason === 'invalid') return show(tr('쓸 수 없는 닉네임이에요'))
+      if (!r.ok && r.reason === 'network') return show(tr('서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요'))
+    }
     actions.setNickname(t)
     show(tr('닉네임을 바꿨어요'))
+  }
+
+  // 회원 탈퇴: 가입한 이메일을 정확히 입력해야 서버가 계정과 모든 데이터를 지운다
+  const withdraw = async () => {
+    if (realUser) {
+      setDelBusy(true)
+      const r = await deleteMyAccount(delEmail.trim())
+      setDelBusy(false)
+      if (!r.ok) {
+        show(
+          r.reason === 'mismatch' ? tr('이메일이 맞지 않아요')
+          : r.reason === 'setup' ? tr('서버 준비가 안 돼서 지금은 탈퇴할 수 없어요')
+          : tr('서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요'),
+        )
+        return
+      }
+    }
+    actions.deleteAccount()
   }
 
   const toggleNotif = async (on: boolean) => {
@@ -281,6 +316,18 @@ export function Settings() {
     <>
       <TopBar title={tr('설정')} back />
       <Page>
+        {realUser && (
+          <Card title={tr('서버 저장')}>
+            <p className="muted" role="status">
+              {sync.phase === 'saved' ? tr('서버에 자동으로 저장돼요 · 마지막 저장 {0}', [new Date(sync.at ?? Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })])
+                : sync.phase === 'saving' || sync.phase === 'loading' ? tr('저장하는 중이에요')
+                : sync.phase === 'error' && sync.error === 'setup' ? tr('서버 저장 준비가 아직 안 됐어요. 서버 설정(SQL)을 적용하면 자동으로 저장돼요')
+                : sync.phase === 'error' ? tr('서버에 연결하지 못했어요. 연결되면 자동으로 다시 시도해요')
+                : ''}
+            </p>
+          </Card>
+        )}
+
         <Card title="언어 · Language">
           <Segmented
             value={st.lang}
@@ -390,6 +437,7 @@ export function Settings() {
         )}
 
         <div style={{ padding: '8px 16px' }}>
+          <button className="btn ghost" style={{ marginBottom: 10 }} onClick={() => { void (authEnabled ? logoutAndClear() : Promise.resolve(actions.logout())) }}>{tr('로그아웃')}</button>
           <button className="btn danger" onClick={() => setConfirmDel(true)}>{tr('회원 탈퇴')}</button>
         </div>
       </Page>
@@ -398,7 +446,13 @@ export function Settings() {
         <Sheet mid onClose={() => setConfirmDel(false)}>
           <h3 className="card-title">{tr('정말 탈퇴할까요?')}</h3>
           <p className="sub">{tr('운동, 영양, 신체 기록과 작성한 코멘트가 즉시 삭제되며 되돌릴 수 없어요.')}</p>
-          <button className="btn danger mt16" onClick={() => actions.deleteAccount()}>{tr('탈퇴하고 모두 삭제')}</button>
+          {realUser && (
+            <>
+              <p className="sub mt12">{tr('확인을 위해 가입한 이메일 {0} 을(를) 입력해주세요', [s.user?.email ?? ''])}</p>
+              <input className="input mt8" type="email" autoComplete="off" value={delEmail} onChange={(e) => setDelEmail(e.target.value)} placeholder={tr('이메일')} aria-label={tr('이메일')} />
+            </>
+          )}
+          <button className="btn danger mt16" disabled={!delOk || delBusy} onClick={withdraw}>{tr('탈퇴하고 모두 삭제')}</button>
           <button className="btn ghost mt8" onClick={() => setConfirmDel(false)}>{tr('취소')}</button>
         </Sheet>
       )}
@@ -409,14 +463,24 @@ export function Settings() {
 
 const PROVIDERS: { id: Provider; name: string }[] = [
   { id: 'google', name: 'Google' },
-  { id: 'facebook', name: 'Facebook' },
-  { id: 'apple', name: 'Apple' },
+  { id: 'email', name: '이메일' },
 ]
 
 export function Account() {
   const s = useAppState()
   const [toast, show] = useToast()
   const linked = s.user?.providers ?? []
+  const [pw, setPw] = useState('')
+  const [busy, setBusy] = useState(false)
+  const savePw = async () => {
+    if (pw.length < 8) return show(tr('비밀번호는 8자 이상이에요'))
+    setBusy(true)
+    const f = await changePassword(pw)
+    setBusy(false)
+    if (f) return show(tr('실패했어요. 잠시 후 다시 시도해주세요'))
+    setPw('')
+    show(tr('비밀번호를 바꿨어요'))
+  }
   return (
     <>
       <TopBar title={tr('계정 연결')} back />
@@ -427,7 +491,8 @@ export function Account() {
             const on = linked.includes(p.id)
             return (
               <div className="list-item" key={p.id}>
-                <span className="grow"><b>{p.name}</b><div className="muted" style={{ fontSize: 13 }}>{on ? tr('연결됨') : tr('연결 안 됨')}</div></span>
+                <span className="grow"><b>{tr(p.name)}</b><div className="muted" style={{ fontSize: 13 }}>{on ? tr('연결됨') : tr('연결 안 됨')}</div></span>
+                {!authEnabled && (
                 <button
                   className={`btn sm ${on ? 'ghost' : ''}`}
                   onClick={() => {
@@ -440,11 +505,20 @@ export function Account() {
                 >
                   {on ? tr('해제') : tr('연결')}
                 </button>
+                )}
               </div>
             )
           })}
         </div>
-        <p className="sub" style={{ padding: '0 20px' }}>{tr('이 버전은 데모 로그인이에요. 실제 로그인은 Firebase Authentication 연결 후 동작해요.')}</p>
+        {authEnabled && linked.includes('email') && (
+          <Card title={tr('비밀번호 변경')}>
+            <div className="row gap8">
+              <input className="input" type="password" autoComplete="new-password" placeholder={tr('새 비밀번호 (8자 이상)')} value={pw} onChange={(e) => setPw(e.target.value)} aria-label={tr('새 비밀번호')} />
+              <button className="btn sm" disabled={busy || !pw} onClick={savePw}>{tr('변경')}</button>
+            </div>
+          </Card>
+        )}
+        <p className="sub" style={{ padding: '0 20px' }}>{authEnabled ? tr('로그인한 계정이 연결돼 있어요. 로그인 수단을 늘리는 기능은 곧 추가돼요.') : tr('이 버전은 데모 로그인이에요. 실제 로그인은 Firebase Authentication 연결 후 동작해요.')}</p>
       </Page>
       {toast}
     </>

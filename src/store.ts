@@ -19,6 +19,9 @@ import { uid } from './lib/format'
 import { ymd } from './lib/dates'
 import { BANNED_WORDS } from './lib/constants'
 import { setLang } from './lib/i18n'
+import { authEnabled, signOut, type AuthUser } from './lib/auth'
+import { deleteCommentOnServer, postCommentToServer, reportCommentOnServer } from './lib/cloud'
+import { SYNC_KEYS, mergeServerPayload, type SyncPayload } from './lib/syncData'
 import { activityFromWeekly } from './lib/calc'
 
 const KEY = 'kilo.state.v1'
@@ -81,6 +84,8 @@ function initial(): AppState {
     comments: seedComments(),
     blocks: [],
     lastReminderDate: '',
+    updatedAt: 0,
+    syncedUserId: null,
   }
 }
 
@@ -117,7 +122,14 @@ function set(next: AppState) {
 }
 
 function patch(p: Partial<AppState>) {
-  set({ ...state, ...p })
+  const synced = Object.keys(p).some((k) => SYNC_KEYS.has(k))
+  set({ ...state, ...p, ...(synced ? { updatedAt: Date.now() } : {}) })
+}
+
+// 서버 저장 도우미가 값이 바뀔 때마다 알림을 받는 통로
+export function subscribe(l: () => void): () => void {
+  listeners.add(l)
+  return () => listeners.delete(l)
 }
 
 export function getState(): AppState {
@@ -216,6 +228,20 @@ export const actions = {
     }
     patch({ user })
   },
+  // 로그인 상태가 바뀌면 호출된다 (Supabase 인증). null이면 로그아웃
+  applyAuthUser(a: AuthUser | null) {
+    const cur = state.user
+    if (!a) {
+      // 데모 계정(me-...)은 서버 로그인과 상관없으니 그대로 둔다
+      if (cur && !cur.id.startsWith('me-')) patch({ user: null })
+      return
+    }
+    const providers = a.providers.filter((p): p is Provider => p === 'google' || p === 'apple' || p === 'facebook' || p === 'email')
+    // 닉네임은 서버(profiles)가 기준이다. 같은 계정이면 이 기기의 값을 그대로 두고, 아니면 서버에서 읽어 올 때까지 비운다
+    const nickname = cur?.id === a.id ? cur.nickname : ''
+    const next: User = { id: a.id, nickname, email: a.email, providers, joinedAt: a.joinedAt }
+    if (JSON.stringify(cur) !== JSON.stringify(next)) patch({ user: next })
+  },
   linkProvider(p: Provider) {
     const u = state.user
     if (u && !u.providers.includes(p)) patch({ user: { ...u, providers: [...u.providers, p] } })
@@ -237,10 +263,33 @@ export const actions = {
   },
   logout() {
     patch({ user: null })
+    if (authEnabled) void signOut()
   },
   // 회원 탈퇴: 모든 데이터 즉시 삭제 (오픈 이슈 6 기본 처리)
   deleteAccount() {
     set(initial())
+    setLang('ko')
+    if (authEnabled) void signOut()
+  },
+  // 서버 저장: 서버에서 읽은 데이터를 이 기기에 적용한다
+  applyServerPayload(p: SyncPayload, userId: string) {
+    const merged = mergeServerPayload(state, p)
+    if (merged.settings) setLang(merged.settings.lang)
+    set({ ...state, ...merged, syncedUserId: userId })
+  },
+  // 서버 저장: 이 기기의 데이터가 이 계정의 것이라고 표시한다 (서버에 저장 완료)
+  markSynced(userId: string) {
+    if (state.syncedUserId !== userId) set({ ...state, syncedUserId: userId })
+  },
+  // 커뮤니티: 서버가 돌려준 이번 달 글로 바꾼다. 아직 올리는 중인 내 글(tmp-)은 남긴다
+  setComments(list: Comment[]) {
+    set({ ...state, comments: [...list, ...state.comments.filter((c) => c.id.startsWith('tmp-'))] })
+  },
+  // 다른 계정의 데이터가 남아 있을 때 비운다 (로그인 정보와 커뮤니티 글은 유지)
+  resetData() {
+    const fresh = initial()
+    setLang('ko')
+    set({ ...fresh, user: state.user })
   },
   completeOnboarding(profile: Profile) {
     const log: BodyLog = { id: uid(), at: Date.now(), weightKg: profile.weightKg, muscleKg: null, fatPct: null }
@@ -411,7 +460,7 @@ export const actions = {
   },
 
   // 커뮤니티
-  postComment(text: string): 'ok' | 'empty' | 'long' | 'banned' | 'nouser' {
+  async postComment(text: string): Promise<'ok' | 'empty' | 'long' | 'banned' | 'nouser' | 'rate' | 'failed'> {
     const u = state.user
     if (!u || !u.nickname) return 'nouser'
     const t = text.trim()
@@ -427,11 +476,23 @@ export const actions = {
       deleted: false,
       reporters: [],
     }
+    // 서버 계정: 먼저 화면에 보여 주고(임시 글) 서버에 올린다. 실패하면 임시 글을 지운다
+    if (authEnabled && !u.id.startsWith('me-')) {
+      const tmp: Comment = { ...c, id: 'tmp-' + c.id }
+      set({ ...state, comments: [...state.comments, tmp] })
+      const r = await postCommentToServer(t)
+      set({ ...state, comments: state.comments.filter((x) => x.id !== tmp.id) })
+      if (!r.ok) return r.reason === 'rate' ? 'rate' : r.reason === 'nonick' ? 'nouser' : 'failed'
+      // 실시간으로 이미 받은 글이면 중복으로 넣지 않는다
+      if (!state.comments.some((x) => x.id === r.value.id)) set({ ...state, comments: [...state.comments, r.value] })
+      return 'ok'
+    }
     patch({ comments: [...state.comments, c] })
     return 'ok'
   },
   deleteComment(id: string) {
     patch({ comments: state.comments.map((c) => (c.id === id ? { ...c, deleted: true } : c)) })
+    if (authEnabled && state.user && !state.user.id.startsWith('me-')) void deleteCommentOnServer(id)
   },
   // 신고 3회 누적 시 자동 숨김 (오픈 이슈 12 기본안)
   reportComment(id: string) {
@@ -442,6 +503,7 @@ export const actions = {
         c.id === id && !c.reporters.includes(me) ? { ...c, reporters: [...c.reporters, me] } : c,
       ),
     })
+    if (authEnabled && !me.startsWith('me-')) void reportCommentOnServer(id)
   },
   blockUser(userId: string) {
     if (!state.blocks.includes(userId)) patch({ blocks: [...state.blocks, userId] })

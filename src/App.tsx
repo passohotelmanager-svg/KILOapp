@@ -1,5 +1,5 @@
 import { lazy, tr } from './lib/i18n'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { NavProvider, useNav, type Tab } from './nav'
 import { actions, useAppState, activeSession } from './store'
 import { Icon } from './components/Icon'
@@ -7,6 +7,9 @@ import { RestEngine, openRestScreen, useRestLeft } from './components/RestEngine
 import { mmss } from './lib/format'
 import { ymd } from './lib/dates'
 import { publishDeveloperVolume, toDeveloperVolume } from './lib/developerVolume'
+import { authEnabled, startAuthSync } from './lib/auth'
+import { startSync, useSyncStatus } from './lib/sync'
+import { startCommunitySync } from './lib/communitySync'
 import { showNotification } from './lib/alarm'
 import { Onboarding } from './screens/Onboarding'
 import { Today } from './screens/Today'
@@ -129,6 +132,15 @@ function Main() {
 
 export function App() {
   const s = useAppState()
+  // 로그인 상태를 읽어 오는 동안(로그인 창에서 돌아온 직후 포함)에는 처음 화면이 잠깐 보이지 않게 비워 둔다
+  const [authReady, setAuthReady] = useState(false)
+  useEffect(() => startAuthSync((u) => actions.applyAuthUser(u), () => setAuthReady(true)), [])
+  useEffect(() => startSync(), [])
+  useEffect(() => startCommunitySync(), [])
+  const sync = useSyncStatus()
+  // 로그인 직후 서버의 내 데이터를 불러오는 동안에는 화면을 비워 둔다 (처음 화면이 잠깐 보이지 않게)
+  const loadingMine = authEnabled && !!s.user && !s.user.id.startsWith('me-') && sync.phase === 'loading'
+  if (!authReady || loadingMine) return <div className="shell" />
   // 온보딩, 로그인, 닉네임 설정이 끝나기 전에는 푸터를 숨긴다
   if (!s.onboarded || !s.user || !s.user.nickname) {
     return (
