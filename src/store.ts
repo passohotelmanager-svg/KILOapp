@@ -18,6 +18,7 @@ import type {
 import { uid } from './lib/format'
 import { ymd } from './lib/dates'
 import { BANNED_WORDS } from './lib/constants'
+import { setLang } from './lib/i18n'
 import { activityFromWeekly } from './lib/calc'
 
 const KEY = 'kilo.state.v1'
@@ -26,6 +27,7 @@ export const BUILTIN: Exercise[] = seed as Exercise[]
 
 const defaultSettings: Settings = {
   nameLang: 'ko',
+  lang: 'ko',
   restDefault: 30,
   remindOn: false,
   remindDays: [1, 3, 5],
@@ -96,6 +98,7 @@ function load(): AppState {
 }
 
 let state: AppState = load()
+setLang(state.settings.lang)
 const listeners = new Set<() => void>()
 
 function persist() {
@@ -249,6 +252,10 @@ export const actions = {
     patch({ profile: { ...state.profile, ...next } })
   },
   updateSettings(p: Partial<Settings>) {
+    if (p.lang) setLang(p.lang)
+    // 종목명 표기는 화면 언어를 따라가게 한다 (기본값일 때만)
+    if (p.lang === 'en' && state.settings.nameLang === 'ko') p = { ...p, nameLang: 'en' }
+    if (p.lang === 'ko' && state.settings.nameLang === 'en') p = { ...p, nameLang: 'ko' }
     patch({ settings: { ...state.settings, ...p } })
   },
   addBodyLog(l: Omit<BodyLog, 'id' | 'at'>) {

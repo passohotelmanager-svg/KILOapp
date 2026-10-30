@@ -1,4 +1,5 @@
 // 휴식 타이머 전체 화면과 종료 알람. 앱 어디서든 유지된다 (F-06, 7.4).
+import { tr } from '../lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { actions, useStore } from '../store'
 import { holdScreen, releaseScreen, showNotification, startAlarm, stopAlarm } from '../lib/alarm'
@@ -46,7 +47,7 @@ export function RestEngine() {
       setRinging(true)
       setOpen(false)
       startAlarm()
-      if (consent) showNotification('휴식이 끝났어요', '다음 세트를 시작해주세요')
+      if (consent) showNotification(tr('휴식이 끝났어요'), tr('다음 세트를 시작해주세요'))
     }
   }, [now, rest, ringing, consent])
 
@@ -68,11 +69,11 @@ export function RestEngine() {
 
   if (ringing && rest) {
     return (
-      <div className="alarm" role="alertdialog" aria-label="휴식 종료">
-        <h1>휴식 끝!</h1>
+      <div className="alarm" role="alertdialog" aria-label={tr('휴식 종료')}>
+        <h1>{tr('휴식 끝!')}</h1>
         <p>{rest.label}</p>
-        <p style={{ opacity: 0.85, marginTop: 4 }}>다음 세트를 시작해주세요</p>
-        <button onClick={dismiss}>다음 세트 시작</button>
+        <p style={{ opacity: 0.85, marginTop: 4 }}>{tr('다음 세트를 시작해주세요')}</p>
+        <button onClick={dismiss}>{tr('다음 세트 시작')}</button>
       </div>
     )
   }
@@ -84,16 +85,16 @@ export function RestEngine() {
       actions.startRest(Math.ceil((endsAt - Date.now()) / 1000), rest.label)
     }
     return (
-      <div className="rest-full" role="dialog" aria-label="휴식 타이머">
+      <div className="rest-full" role="dialog" aria-label={tr('휴식 타이머')}>
         <p style={{ opacity: 0.7 }}>{rest.label}</p>
         <div className="big" aria-live="off">{mmss(left)}</div>
         <div className="row gap12 mt24">
-          <button className="btn ghost sm" onClick={() => adjust(-10)}>-10초</button>
-          <button className="btn ghost sm" onClick={() => adjust(10)}>+10초</button>
+          <button className="btn ghost sm" onClick={() => adjust(-10)}>{tr('-10초')}</button>
+          <button className="btn ghost sm" onClick={() => adjust(10)}>{tr('+10초')}</button>
         </div>
         <div className="row gap12 mt24">
-          <button className="btn line sm" onClick={() => setOpen(false)}>접어두기</button>
-          <button className="btn sm" onClick={dismiss}>건너뛰기</button>
+          <button className="btn line sm" onClick={() => setOpen(false)}>{tr('접어두기')}</button>
+          <button className="btn sm" onClick={dismiss}>{tr('건너뛰기')}</button>
         </div>
       </div>
     )

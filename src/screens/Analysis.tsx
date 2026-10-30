@@ -1,4 +1,5 @@
 // 분석 화면 (PRD 7.6, 7.10) : 사진 기준 기본 구역 1~10 + 부위별 볼륨 그래프 11~15
+import { tr } from '../lib/i18n'
 import { useMemo, useState } from 'react'
 import { exName, useAppState } from '../store'
 import { useNav } from '../nav'
@@ -9,14 +10,16 @@ import {
   OTHER_COLOR, PARTS, PART_COLOR, PART_NAME, SUBS_OF, SUB_NAME,
 } from '../lib/constants'
 import {
-  WEEK_HEADERS, addDays, addMonths, dayLabel, endOfMonth, isFuture, mdDash, mdLabel, monthLabel,
+  WEEK_HEADERS, addDays, addMonths, dayLabel, endOfMonth, isFuture, mdDash, mdLabel, monthLabel, monthName,
   parseYmd, startOfMonth, startOfWeek, weekLabel, ymd,
 } from '../lib/dates'
 import { vol, comma, hm, mmss, pct } from '../lib/format'
-import { dailyTarget, sessionSeconds, tdee, type Aggregate } from '../lib/calc'
-import { agg, kcalOn, macrosOn, monthStat, recordedSessions, secondsByDay, workoutDays } from '../lib/stats'
+import { cardioBurn, dailyTarget, sessionSeconds, tdee, type Aggregate } from '../lib/calc'
+import { agg, kcalOn, lookupFor, macrosOn, monthStat, recordedSessions, secondsByDay, workoutDays } from '../lib/stats'
 import { darken, lighten } from '../lib/color'
-import { renderShareImage, shareImage } from '../lib/share'
+import { renderDetailImage, renderShareImage, renderSummaryImage } from '../lib/share'
+import { ShareSheet, type ShareChoice } from '../components/ShareSheet'
+import { buildSummary } from '../lib/summary'
 import type { Exercise, PartCode, SubPartCode } from '../types'
 
 type Tab = 'day' | 'week' | 'month'
@@ -29,13 +32,26 @@ export function Analysis() {
   const todayKey = ymd(today)
   const [toast, show] = useToast()
 
-  // ---- 사진 기준 기본 구역 (고정 기간) ----
-  const from7 = startOfWeek(today) // 한 주는 월요일부터 일요일까지
-  const to7 = addDays(from7, 6)
-  const secDays = secondsByDay(s, from7, to7)
-  const totalSec = Object.values(secDays).reduce((a, b) => a + b, 0)
-  const days7 = Array.from({ length: 7 }, (_, i) => addDays(from7, i))
-  const a7 = agg(s, from7, to7)
+  // ---- 헤더에서 고른 기간 (하루 또는 한 주). 이 아래 구역과 공유 이미지가 모두 따른다 ----
+  const [mode, setMode] = useState<'day' | 'week'>('week')
+  const [anchor, setAnchor] = useState(today)
+  const [pickMode, setPickMode] = useState<'day' | 'week' | null>(null)
+  const { from: pFrom, to: pTo } = periodOf(mode, anchor)
+  const weekStart = startOfWeek(anchor) // 한 주는 월요일부터 일요일까지
+  const days7 = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  const periodDays = mode === 'day' ? [anchor] : days7
+  const periodText = mode === 'day' ? dayLabel(anchor) : weekLabel(weekStart)
+  const secDays = secondsByDay(s, weekStart, addDays(weekStart, 6))
+  const totalSec = periodDays.reduce((acc, d) => acc + (secDays[ymd(d)] ?? 0), 0)
+  const a7 = agg(s, pFrom, pTo)
+
+  // 기간 이동: 하루는 1일, 한 주는 7일씩. 미래로는 넘어가지 않는다
+  const shift = (dir: 1 | -1) => {
+    const next = addDays(anchor, (mode === 'day' ? 1 : 7) * dir)
+    if (dir > 0 && isFuture(periodOf(mode, next).from)) return
+    setAnchor(next)
+  }
+  const canNext = !isFuture(periodOf(mode, addDays(anchor, mode === 'day' ? 1 : 7)).from)
   const vol7: Record<string, number> = {}
   PARTS.forEach((p) => (vol7[p] = a7.byPart[p].volume))
   const [open7, setOpen7] = useState<PartCode | null>(null)
@@ -47,10 +63,10 @@ export function Analysis() {
 
   const [calTab, setCalTab] = useState<'in' | 'out'>('in')
   const intake = days7.map((d) => kcalOn(s, ymd(d)))
-  const eatenDays = intake.filter((v) => v > 0)
+  const eatenDays = periodDays.map((d) => kcalOn(s, ymd(d))).filter((v) => v > 0)
   const avgIntake = eatenDays.length ? eatenDays.reduce((a, b) => a + b, 0) / eatenDays.length : 0
   const burn = s.profile ? Math.round(tdee(s.profile)) : 0
-  const mac = macrosOn(s, from7, to7)
+  const mac = macrosOn(s, pFrom, pTo)
   const macAvgK = mac.days ? mac.kcal / mac.days : 0
   const cK = mac.carb * 4
   const pK = mac.protein * 4
@@ -60,7 +76,7 @@ export function Analysis() {
   const diff = (cur: number, prev: number, fmt: (n: number) => string, prevLabel: string) => {
     if (!prev) return <span className="muted">{prevLabel}</span>
     const d = cur - prev
-    if (d === 0) return <b>변동 없음</b>
+    if (d === 0) return <b>{tr('변동 없음')}</b>
     return (
       <b style={{ color: d > 0 ? 'var(--inc)' : 'var(--dec)', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
         <Icon name={d > 0 ? 'tri_up' : 'tri_down'} size={12} fill="currentColor" strokeWidth={0} />
@@ -72,19 +88,31 @@ export function Analysis() {
   return (
     <>
       <TopBar
-        title="분석"
+        title={tr('분석')}
         right={
-          <button className="iconbtn" aria-label="설정" onClick={() => nav.push('settings')}>
+          <button className="iconbtn" aria-label={tr('설정')} onClick={() => nav.push('settings')}>
             <Icon name="settings" />
             {s.settings.notifConsent === null && <span className="badge-dot" />}
           </button>
         }
       />
+      <div className="period-bar">
+        <button className="iconbtn" aria-label={tr('이전 기간')} onClick={() => shift(-1)}><Icon name="left" /></button>
+        <button className={`period-win ${mode === 'day' ? 'on' : ''}`} onClick={() => setPickMode('day')} aria-label={tr('하루 선택')} aria-pressed={mode === 'day'}>
+          <span>{tr('하루')}</span>
+          <b>{dayLabel(anchor)}</b>
+        </button>
+        <button className={`period-win ${mode === 'week' ? 'on' : ''}`} onClick={() => setPickMode('week')} aria-label={tr('한 주 선택')} aria-pressed={mode === 'week'}>
+          <span>{tr('주')}</span>
+          <b>{weekLabel(weekStart)}</b>
+        </button>
+        <button className="iconbtn" aria-label={tr('다음 기간')} disabled={!canNext} style={{ opacity: canNext ? 1 : 0.3 }} onClick={() => shift(1)}><Icon name="right" /></button>
+      </div>
       <Page>
         {/* 2 운동 현황 */}
-        <Card title="운동 현황" onMore={() => nav.push('detail', { kind: 'workout' })}>
+        <Card title={tr('운동 현황')} onMore={() => nav.push('detail', { kind: 'workout' })}>
           <div className="num">{totalSec ? hm(totalSec) : '-'}</div>
-          <p className="muted">이번 주 합계</p>
+          <p className="muted">{mode === 'day' ? tr('하루 합계') : tr('주간 합계')} · {periodText}</p>
           <div className="hr" />
           <div className="circle-days">
             {days7.map((d) => {
@@ -92,7 +120,7 @@ export function Analysis() {
               return (
                 <div key={ymd(d)}>
                   <i className={sec ? 'on' : ''}>{sec ? mmss(sec) : '-'}</i>
-                  {['일', '월', '화', '수', '목', '금', '토'][d.getDay()]}
+                  {[tr('일'), tr('월'), tr('화'), tr('수'), tr('목'), tr('금'), tr('토')][d.getDay()]}
                 </div>
               )
             })}
@@ -100,8 +128,8 @@ export function Analysis() {
         </Card>
 
         {/* 3 근육 피로도 */}
-        <Card title="근육 피로도">
-          <p className="muted" style={{ marginBottom: 10 }}>{mdLabel(from7)} ~ {mdLabel(to7)}</p>
+        <Card title={tr('근육 피로도')}>
+          <p className="muted" style={{ marginBottom: 10 }}>{periodText}</p>
           <div className="graybox">
             <BodyMap volumes={vol7} />
           </div>
@@ -111,7 +139,7 @@ export function Analysis() {
         <Card className="">
           <table className="tbl">
             <thead>
-              <tr><th>부위</th><th className="r">볼륨</th><th className="r">세트</th></tr>
+              <tr><th>{tr('부위')}</th><th className="r">{tr('볼륨')}</th><th className="r">{tr('세트')}</th></tr>
             </thead>
             <tbody>
               {PARTS.map((p) => {
@@ -123,65 +151,65 @@ export function Analysis() {
               })}
             </tbody>
           </table>
-          {PARTS.every((p) => a7.byPart[p].sets === 0) && <p className="muted center mt8">이번 주 기록 없음</p>}
+          {PARTS.every((p) => a7.byPart[p].sets === 0) && <p className="muted center mt8">{tr('기록 없음')}</p>}
         </Card>
 
         {/* 5 월간 운동 현황 */}
-        <Card title={`${today.getMonth() + 1}월 운동 현황`} onMore={() => nav.push('detail', { kind: 'month' })}>
+        <Card title={tr('{0}월 운동 현황', [today.getMonth() + 1])} onMore={() => nav.push('detail', { kind: 'month' })}>
           <div className="three">
             <div><Icon name="clock" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.seconds ? hm(mNow.seconds) : '-'}</div></div>
             <div><Icon name="muscle" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? Math.round(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
-            <div><Icon name="dumbbell" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.count || '-'}{mNow.count ? <small>회</small> : null}</div></div>
+            <div><Icon name="dumbbell" color="var(--primary)" /><div className="num" style={{ fontSize: 20 }}>{mNow.count || '-'}{mNow.count ? <small>{tr('회')}</small> : null}</div></div>
           </div>
         </Card>
 
         {/* 6 전월 대비 */}
-        <Card title="전월 대비" onMore={() => nav.push('detail', { kind: 'month' })}>
+        <Card title={tr('전월 대비')} onMore={() => nav.push('detail', { kind: 'month' })}>
           <div className="two">
-            <div><p className="muted">평균 운동 시간</p><div className="num" style={{ fontSize: 20 }}>{avgNow ? hm(avgNow) : '-'}</div></div>
-            <div><p className="muted">현재 볼륨 총합</p><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? vol(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
-            <div><p className="muted">전월 대비 시간</p>{diff(avgNow, avgPrev, (n) => hm(n), '지난달 기록 없음')}</div>
-            <div><p className="muted">전월 대비 볼륨</p>{diff(mNow.volume, mPrev.volume, (n) => `${vol(n)}kg`, '지난달 기록 없음')}</div>
+            <div><p className="muted">{tr('평균 운동 시간')}</p><div className="num" style={{ fontSize: 20 }}>{avgNow ? hm(avgNow) : '-'}</div></div>
+            <div><p className="muted">{tr('현재 볼륨 총합')}</p><div className="num" style={{ fontSize: 20 }}>{mNow.volume ? vol(mNow.volume) : '-'}{mNow.volume ? <small>kg</small> : null}</div></div>
+            <div><p className="muted">{tr('전월 대비 시간')}</p>{diff(avgNow, avgPrev, (n) => hm(n), tr('지난달 기록 없음'))}</div>
+            <div><p className="muted">{tr('전월 대비 볼륨')}</p>{diff(mNow.volume, mPrev.volume, (n) => `${vol(n)}kg`, tr('지난달 기록 없음'))}</div>
           </div>
         </Card>
 
         {/* 7 식단 구역 제목 */}
-        <h2 className="section-title">식단</h2>
+        <h2 className="section-title">{tr('식단')}</h2>
 
         {/* 8 칼로리 변화 */}
-        <Card title="칼로리 변화" onMore={() => nav.push('detail', { kind: 'calories' })}>
-          <Segmented value={calTab} onChange={setCalTab} options={[{ value: 'in', label: '섭취' }, { value: 'out', label: '소비' }]} />
-          <p className="muted mt12">{mdLabel(from7)} ~ {mdLabel(to7)}</p>
+        <Card title={tr('칼로리 변화')} onMore={() => nav.push('detail', { kind: 'calories' })}>
+          <Segmented value={calTab} onChange={setCalTab} options={[{ value: 'in', label: tr('섭취') }, { value: 'out', label: tr('소비') }]} />
+          <p className="muted mt12">{periodText}</p>
           {calTab === 'in' ? (
             <p className="sentence" style={{ fontSize: 18, fontWeight: 700 }}>
-              {avgIntake ? <>하루 평균 <b>{comma(avgIntake)}</b>kcal 먹었어요</> : '아직 식단 기록이 없어요'}
+              {avgIntake ? <>{tr('하루 평균')} <b>{comma(avgIntake)}</b>{tr('kcal 먹었어요')}</> : tr('아직 식단 기록이 없어요')}
             </p>
           ) : (
             <p className="sentence" style={{ fontSize: 18, fontWeight: 700 }}>
-              {burn ? <>하루 평균 <b>{comma(burn)}</b>kcal 소비했어요</> : '신체 정보가 필요해요'}
+              {burn ? <>{tr('하루 평균')} <b>{comma(burn)}</b>{tr('kcal 소비했어요')}</> : tr('신체 정보가 필요해요')}
             </p>
           )}
           <div className="graybox mt12">
             <RoundBars
               items={days7.map((d, i) => ({ label: mdDash(d), value: calTab === 'in' ? intake[i] : burn }))}
-              todayIndex={6}
+              todayIndex={days7.findIndex((d) => ymd(d) === todayKey)}
               avg={calTab === 'in' ? avgIntake || undefined : burn || undefined}
               unit="kcal"
             />
           </div>
-          {calTab === 'out' && <p className="muted mt8" style={{ fontSize: 12 }}>소비 열량은 기초대사량과 활동 계수로 계산한 하루 총 소비 열량(TDEE) 추정치예요</p>}
+          {calTab === 'out' && <p className="muted mt8" style={{ fontSize: 12 }}>{tr('소비 열량은 기초대사량과 활동 계수로 계산한 하루 총 소비 열량(TDEE) 추정치예요')}</p>}
         </Card>
 
         {/* 9 영양소 */}
-        <Card title="영양소" onMore={() => nav.push('detail', { kind: 'nutrients' })}>
-          <p className="muted">이번 주 평균 | {mdLabel(from7)} ~ {mdLabel(to7)}</p>
+        <Card title={tr('영양소')} onMore={() => nav.push('detail', { kind: 'nutrients' })}>
+          <p className="muted">{mode === 'day' ? tr('하루') : tr('주간 평균')} | {periodText}</p>
           <div className="num">{macAvgK ? comma(macAvgK) : '-'}{macAvgK ? <small>kcal</small> : null}</div>
           <div className="center mt12"><Donut slices={[{ value: cK, color: '#FFC978' }, { value: pK, color: '#F27052' }, { value: fK, color: '#6FD6A0' }]} /></div>
           <div className="three mt12">
             {[
-              { n: '탄수화물', c: 'var(--carb)', k: cK, g: mac.carb },
-              { n: '단백질', c: 'var(--protein)', k: pK, g: mac.protein },
-              { n: '지방', c: 'var(--fat)', k: fK, g: mac.fat },
+              { n: tr('탄수화물'), c: 'var(--carb)', k: cK, g: mac.carb },
+              { n: tr('단백질'), c: 'var(--protein)', k: pK, g: mac.protein },
+              { n: tr('지방'), c: 'var(--fat)', k: fK, g: mac.fat },
             ].map((x) => (
               <div key={x.n}>
                 <div style={{ fontSize: 13 }}><span className="swatch" style={{ background: x.c, borderRadius: '50%' }} />{x.n}</div>
@@ -190,14 +218,28 @@ export function Analysis() {
               </div>
             ))}
           </div>
-          {macTotal === 0 && <p className="muted center mt8">기록 없음</p>}
+          {macTotal === 0 && <p className="muted center mt8">{tr('기록 없음')}</p>}
         </Card>
 
         {/* 11 볼륨 그래프 */}
-        <h2 className="section-title">볼륨 그래프</h2>
-        <VolumeGraph showToast={show} workoutDaySet={workoutDays(s)} todayKey={todayKey} />
+        <h2 className="section-title">{tr('볼륨 그래프')}</h2>
+        <VolumeGraph key={`${mode}-${ymd(anchor)}`} showToast={show} mode={mode} anchor={anchor} />
       </Page>
       {toast}
+      {pickMode && (
+        <DateSheet
+          initialMode={pickMode}
+          anchor={anchor}
+          workoutDaySet={workoutDays(s)}
+          todayKey={todayKey}
+          onClose={() => setPickMode(null)}
+          onDone={(m, d) => {
+            setMode(m)
+            setAnchor(d)
+            setPickMode(null)
+          }}
+        />
+      )}
     </>
   )
 }
@@ -213,7 +255,7 @@ function PartRows({ part, stat, expanded, onToggle, a }: { part: PartCode; stat:
         <td className="r">{stat.volume ? <><b>{comma(stat.volume)}</b><span className="unit">kg</span></> : '-'}</td>
         <td className="r">{stat.sets || '-'}</td>
       </tr>
-      {expanded && stat.sets === 0 && <tr className="sub"><td colSpan={3} className="muted">기록 없음</td></tr>}
+      {expanded && stat.sets === 0 && <tr className="sub"><td colSpan={3} className="muted">{tr('기록 없음')}</td></tr>}
       {expanded && subs.map((sp) => a.bySub[sp] && (
         <tr className="sub" key={sp}>
           <td>{SUB_NAME[sp]}</td>
@@ -243,13 +285,11 @@ function periodOf(tab: Tab, anchor: Date) {
   return { from: startOfMonth(anchor), to: endOfMonth(anchor) }
 }
 
-function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: string) => void; workoutDaySet: Set<string>; todayKey: string }) {
+function VolumeGraph({ showToast, mode, anchor }: { showToast: (m: string) => void; mode: 'day' | 'week'; anchor: Date }) {
   const s = useAppState()
-  const [tab, setTab] = useState<Tab>('week')
-  const [anchor, setAnchor] = useState(new Date())
+  const tab = mode as Tab
   const [dim, setDim] = useState<string | null>(null)
   const [drill, setDrill] = useState<Drill>(null)
-  const [pick, setPick] = useState(false)
 
   const { from, to } = periodOf(tab, anchor)
   const buckets = useMemo(() => {
@@ -263,6 +303,9 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
 
   const aggs = buckets.map((b) => agg(s, b.d, b.d))
   const pa = agg(s, from, to)
+  // 소모 칼로리 계산에 쓰는 체중: 가장 최근 체중 기록, 없으면 온보딩에서 입력한 체중
+  const weightKg = [...s.bodyLog].reverse().find((l) => l.weightKg)?.weightKg ?? s.profile?.weightKg ?? 0
+  const burn = weightKg > 0 ? cardioBurn(s.sessions, ymd(from), ymd(to), lookupFor(s), weightKg) : null
 
   // 종목별 보기에서 상위 5개 종목 (볼륨 기준)
   const top5 = useMemo(() => {
@@ -285,7 +328,7 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
       const ex = pa.byExercise[id].exercise
       return { key: id, label: exName(s, ex), color: PART_COLOR[PARTS[i % 6]] }
     })
-    return [...defs, { key: 'other', label: '기타', color: OTHER_COLOR }]
+    return [...defs, { key: 'other', label: tr('기타'), color: OTHER_COLOR }]
   }, [drill, top5, pa, s])
 
   const valueOf = (a: Aggregate, key: string): number => {
@@ -318,14 +361,6 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
     .filter((r) => r.sets > 0 || r.volume > 0)
   const total = rows.reduce((a, r) => a + r.volume, 0)
 
-  // 기간 이동
-  const shift = (dir: 1 | -1) => {
-    const next = tab === 'day' ? addDays(anchor, dir) : tab === 'week' ? addDays(anchor, 7 * dir) : addMonths(anchor, dir)
-    const p = periodOf(tab, next)
-    if (dir > 0 && isFuture(p.from)) return
-    setAnchor(next)
-  }
-  const canNext = !isFuture(periodOf(tab, tab === 'day' ? addDays(anchor, 1) : tab === 'week' ? addDays(anchor, 7) : addMonths(anchor, 1)).from)
   const periodText = tab === 'day' ? dayLabel(anchor) : tab === 'week' ? weekLabel(from) : monthLabel(anchor)
 
   const hasBody = pa.bodyReps > 0
@@ -334,37 +369,31 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
 
   const extra = (pick: (a: Aggregate) => number) => buckets.map((b, i) => ({ label: b.label, value: pick(aggs[i]) }))
 
-  const share = async () => {
-    const blob = await renderShareImage({
-      title: `부위별 볼륨${drill ? ` · ${PART_NAME[drill.part]}` : ''}`,
-      period: periodText,
-      total: `${comma(total)}kg`,
-      rows: rows.map((r) => ({ label: r.label, color: r.color, volume: `${comma(r.volume)}kg`, sets: `${r.sets}세트`, percent: pct(r.volume, total) })),
-    })
-    if (!blob) return showToast('이미지를 만들지 못했어요')
-    const r = await shareImage(blob, `kilo-volume-${ymd(from)}.png`)
-    showToast(r === 'saved' ? '이미지를 저장했어요' : '공유했어요')
+  // 공유할 이미지 세 종류를 그린다: 부위별 볼륨, 운동 요약, 세트 상세
+  const [shareOpen, setShareOpen] = useState(false)
+  const buildShare = async (): Promise<ShareChoice[]> => {
+    const sum = buildSummary(s, from, to, weightKg)
+    const title = tr('{0} 운동 요약', [periodText])
+    const [volume, summary, detail] = await Promise.all([
+      renderShareImage({
+        title: tr('부위별 볼륨{0}', [drill ? ` · ${PART_NAME[drill.part]}` : '']),
+        period: periodText,
+        total: `${comma(total)}kg`,
+        rows: rows.map((r) => ({ label: r.label, color: r.color, volume: `${comma(r.volume)}kg`, sets: tr('{0}세트', [r.sets]), percent: pct(r.volume, total) })),
+      }),
+      renderSummaryImage(title, sum),
+      renderDetailImage(title, sum),
+    ])
+    const key = ymd(from)
+    return [
+      { key: 'summary', label: tr('운동 요약'), name: `kilo-summary-${key}.png`, blob: summary },
+      { key: 'detail', label: tr('세트 상세'), name: `kilo-detail-${key}.png`, blob: detail },
+      { key: 'volume', label: tr('부위별 볼륨'), name: `kilo-volume-${key}.png`, blob: volume },
+    ].filter((c): c is ShareChoice => c.blob !== null)
   }
 
   return (
     <>
-      {/* 12 기간 선택 */}
-      <div style={{ padding: '8px 16px' }}>
-        <Segmented value={tab} onChange={(v) => { setTab(v); setDrill(null); setDim(null) }} options={[{ value: 'day', label: '일' }, { value: 'week', label: '주' }, { value: 'month', label: '월' }]} />
-        <div className="row between mt12">
-          <button className="iconbtn" aria-label="이전 기간" onClick={() => shift(-1)}><Icon name="left" /></button>
-          {tab === 'month' ? (
-            <b>{monthLabel(anchor)}</b>
-          ) : (
-            <button className="row gap8" style={{ fontWeight: 700 }} onClick={() => setPick(true)} aria-label="날짜 선택">
-              <Icon name="calendar" size={18} color="var(--primary)" />
-              {periodText}
-            </button>
-          )}
-          <button className="iconbtn" aria-label="다음 기간" disabled={!canNext} style={{ opacity: canNext ? 1 : 0.3 }} onClick={() => shift(1)}><Icon name="right" /></button>
-        </div>
-      </div>
-
       {/* 13 누적 막대 */}
       <Card>
         {drill && (
@@ -372,10 +401,10 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
             <b>{PART_NAME[drill.part]}</b>
             <div className="row gap8">
               {SUBS_OF[drill.part] && (
-                <button className={`chip ${drill.mode === 'sub' ? 'on' : ''}`} onClick={() => { setDrill({ part: drill.part, mode: 'sub' }); setDim(null) }}>하위 부위</button>
+                <button className={`chip ${drill.mode === 'sub' ? 'on' : ''}`} onClick={() => { setDrill({ part: drill.part, mode: 'sub' }); setDim(null) }}>{tr('하위 부위')}</button>
               )}
-              <button className={`chip ${drill.mode === 'exercise' ? 'on' : ''}`} onClick={() => { setDrill({ part: drill.part, mode: 'exercise' }); setDim(null) }}>종목별</button>
-              <button className="chip" onClick={() => { setDrill(null); setDim(null) }}>전체</button>
+              <button className={`chip ${drill.mode === 'exercise' ? 'on' : ''}`} onClick={() => { setDrill({ part: drill.part, mode: 'exercise' }); setDim(null) }}>{tr('종목별')}</button>
+              <button className="chip" onClick={() => { setDrill(null); setDim(null) }}>{tr('전체')}</button>
             </div>
           </div>
         )}
@@ -393,7 +422,7 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
           </>
         ) : (
           <p className="empty">
-            {tab === 'day' ? '이 날은 기록이 없어요' : tab === 'week' ? '이 주는 기록이 없어요' : '이 달은 기록이 없어요'}
+            {tab === 'day' ? tr('이 날은 기록이 없어요') : tab === 'week' ? tr('이 주는 기록이 없어요') : tr('이 달은 기록이 없어요')}
           </p>
         )}
       </Card>
@@ -402,7 +431,7 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
       <Card>
         <table className="tbl">
           <thead>
-            <tr><th>{drill ? '구분' : '부위'}</th><th className="r">볼륨</th><th className="r">세트</th><th className="r">비율</th></tr>
+            <tr><th>{drill ? tr('구분') : tr('부위')}</th><th className="r">{tr('볼륨')}</th><th className="r">{tr('세트')}</th><th className="r">{tr('비율')}</th></tr>
           </thead>
           <tbody>
             {rows.map((r) => (
@@ -417,55 +446,53 @@ function VolumeGraph({ showToast, workoutDaySet, todayKey }: { showToast: (m: st
                 <td className="r">{r.volume ? `${pct(r.volume, total)}%` : '-'}</td>
               </tr>
             ))}
-            {rows.length === 0 && <tr><td colSpan={4} className="muted center">기록 없음</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={4} className="muted center">{tr('기록 없음')}</td></tr>}
             {rows.length > 0 && (
-              <tr><td><b>합계</b></td><td className="r"><b>{comma(total)}kg</b></td><td className="r"><b>{rows.reduce((a, r) => a + r.sets, 0)}</b></td><td className="r">100%</td></tr>
+              <tr><td><b>{tr('합계')}</b></td><td className="r"><b>{comma(total)}kg</b></td><td className="r"><b>{rows.reduce((a, r) => a + r.sets, 0)}</b></td><td className="r">100%</td></tr>
             )}
           </tbody>
         </table>
-        {!drill && rows.length > 0 && <p className="muted mt8" style={{ fontSize: 12 }}>부위를 누르면 하위 부위와 종목별로 나눠 볼 수 있어요</p>}
+        {!drill && rows.length > 0 && <p className="muted mt8" style={{ fontSize: 12 }}>{tr('부위를 누르면 하위 부위와 종목별로 나눠 볼 수 있어요')}</p>}
       </Card>
 
       {/* 단위가 다른 기록은 따로 */}
       {hasBody && (
-        <Card title="맨몸 운동">
-          <div className="num">{comma(pa.bodyReps)}<small>회</small></div>
-          <RoundBars items={extra((a) => a.bodyReps)} unit="회" />
+        <Card title={tr('맨몸 운동')}>
+          <div className="num">{comma(pa.bodyReps)}<small>{tr('회')}</small></div>
+          <RoundBars items={extra((a) => a.bodyReps)} unit={tr('회')} />
         </Card>
       )}
       {hasTime && (
-        <Card title="시간 운동">
-          <div className="num">{comma(pa.timeSec)}<small>초</small></div>
-          <RoundBars items={extra((a) => a.timeSec)} unit="초" />
+        <Card title={tr('시간 운동')}>
+          <div className="num">{comma(pa.timeSec)}<small>{tr('초')}</small></div>
+          <RoundBars items={extra((a) => a.timeSec)} unit={tr('초')} />
         </Card>
       )}
       {hasCardio && (
-        <Card title="유산소">
-          <div className="num">{pa.cardioKm.toFixed(1)}<small>km</small> <span className="num" style={{ fontSize: 20 }}>{comma(pa.cardioMin)}<small>분</small></span></div>
-          <RoundBars items={extra((a) => a.cardioMin)} color="#e5534b" unit="분" />
+        <Card title={tr('유산소')} action={burn && burn.total > 0 ? <b className="burn-kcal">{tr('약 {0}kcal 소모', [comma(burn.total)])}</b> : undefined}>
+          <div className="num">{pa.cardioKm.toFixed(1)}<small>km</small> <span className="num" style={{ fontSize: 20 }}>{comma(pa.cardioMin)}<small>{tr('분')}</small></span></div>
+          <RoundBars items={extra((a) => a.cardioMin)} color="#e5534b" unit={tr('분')} />
+          {burn && burn.rows.length > 0 && (
+            <div className="mt12">
+              {burn.rows.map((r) => (
+                <div key={r.exercise.id} className="row between" style={{ padding: '6px 0' }}>
+                  <span>{exName(s, r.exercise)} <span className="muted">{tr('{0}분', [comma(r.minutes)])}</span></span>
+                  <span className="muted">{tr('약 {0}kcal', [comma(r.kcal)])}</span>
+                </div>
+              ))}
+              <p className="muted" style={{ fontSize: 12 }}>{tr('MET 기준 추정치예요 (체중 {0}kg)', [weightKg])}</p>
+            </div>
+          )}
         </Card>
       )}
 
       {/* 15 공유 */}
       <div style={{ padding: '4px 16px 0' }}>
-        <button className="btn line" onClick={share}><span className="row gap8" style={{ justifyContent: 'center' }}><Icon name="share" size={18} />이미지로 저장 · 공유</span></button>
+        <button className="btn line" onClick={() => setShareOpen(true)}><span className="row gap8" style={{ justifyContent: 'center' }}><Icon name="share" size={18} />{tr('이미지로 저장 · 공유')}</span></button>
       </div>
 
-      {pick && (
-        <DateSheet
-          initialMode={tab === 'week' ? 'week' : 'day'}
-          anchor={anchor}
-          workoutDaySet={workoutDaySet}
-          todayKey={todayKey}
-          onClose={() => setPick(false)}
-          onDone={(mode, d) => {
-            setTab(mode)
-            setAnchor(d)
-            setDrill(null)
-            setPick(false)
-          }}
-        />
-      )}
+      {shareOpen && <ShareSheet build={buildShare} onClose={() => setShareOpen(false)} onDone={(r) => showToast(r === 'saved' ? tr('이미지를 저장했어요') : tr('공유했어요'))} />}
+
     </>
   )
 }
@@ -486,11 +513,11 @@ function DateSheet({ initialMode, anchor, workoutDaySet, todayKey, onClose, onDo
 
   return (
     <Sheet onClose={onClose}>
-      <Segmented value={mode} onChange={setMode} options={[{ value: 'day', label: '하루 선택' }, { value: 'week', label: '한 주 선택' }]} />
+      <Segmented value={mode} onChange={setMode} options={[{ value: 'day', label: tr('하루 선택') }, { value: 'week', label: tr('한 주 선택') }]} />
       <div className="row between mt16">
-        <button className="iconbtn" aria-label="이전 달" onClick={() => setMonth(addMonths(month, -1))}><Icon name="left" /></button>
+        <button className="iconbtn" aria-label={tr('이전 달')} onClick={() => setMonth(addMonths(month, -1))}><Icon name="left" /></button>
         <b>{monthLabel(month)}</b>
-        <button className="iconbtn" aria-label="다음 달" onClick={() => setMonth(addMonths(month, 1))}><Icon name="right" /></button>
+        <button className="iconbtn" aria-label={tr('다음 달')} onClick={() => setMonth(addMonths(month, 1))}><Icon name="right" /></button>
       </div>
       <div className="cal-grid mt8">
         {WEEK_HEADERS.map((h) => <div key={h} className="hd">{h}</div>)}
@@ -502,7 +529,7 @@ function DateSheet({ initialMode, anchor, workoutDaySet, todayKey, onClose, onDo
           const selected = mode === 'day' && ymd(sel) === k
           return (
             <div key={k} className={`cal-cell ${inWeek(d) ? 'weeksel' : ''} ${inWeek(d) && col === 0 ? 'first' : ''} ${inWeek(d) && col === 6 ? 'last' : ''}`}>
-              <button disabled={future} className={selected ? 'sel' : ''} onClick={() => setSel(d)} aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일`}>
+              <button disabled={future} className={selected ? 'sel' : ''} onClick={() => setSel(d)} aria-label={tr('{0}월 {1}일', [d.getMonth() + 1, d.getDate()])}>
                 {d.getDate()}
               </button>
               {workoutDaySet.has(k) && <span className="d" />}
@@ -511,8 +538,8 @@ function DateSheet({ initialMode, anchor, workoutDaySet, todayKey, onClose, onDo
         })}
       </div>
       <div className="row gap8 mt16">
-        <button className="btn ghost" onClick={() => { setSel(today); setMonth(startOfMonth(today)) }}>오늘로 이동</button>
-        <button className="btn" onClick={() => onDone(mode, sel)}>선택 완료</button>
+        <button className="btn ghost" onClick={() => { setSel(today); setMonth(startOfMonth(today)) }}>{tr('오늘로 이동')}</button>
+        <button className="btn" onClick={() => onDone(mode, sel)}>{tr('선택 완료')}</button>
       </div>
       <p className="muted center mt8" style={{ fontSize: 12 }} aria-hidden={todayKey === ''}>
         {mode === 'day' ? dayLabel(sel) : weekLabel(weekStart)}
@@ -526,17 +553,17 @@ function DateSheet({ initialMode, anchor, workoutDaySet, todayKey, onClose, onDo
 export function AnalysisDetail({ kind }: { kind: string }) {
   const s = useAppState()
   const today = new Date()
-  const titles: Record<string, string> = { workout: '운동 현황', month: '월간 운동 현황', calories: '칼로리 변화', nutrients: '영양소' }
+  const titles: Record<string, string> = { workout: tr('운동 현황'), month: tr('월간 운동 현황'), calories: tr('칼로리 변화'), nutrients: tr('영양소') }
 
   const body = (() => {
     if (kind === 'workout') {
       const list = recordedSessions(s).filter((x) => x.date >= ymd(addDays(today, -29))).sort((a, b) => b.startedAt - a.startedAt)
-      if (!list.length) return <p className="empty">최근 30일 기록 없음</p>
+      if (!list.length) return <p className="empty">{tr('최근 30일 기록 없음')}</p>
       return (
         <div className="list-group">
           {list.map((x) => (
             <div className="list-item" key={x.id}>
-              <div className="grow"><b>{parseYmd(x.date).getMonth() + 1}월 {parseYmd(x.date).getDate()}일</b><div className="muted" style={{ fontSize: 13 }}>{x.items.length}종목</div></div>
+              <div className="grow"><b>{mdLabel(parseYmd(x.date))}</b><div className="muted" style={{ fontSize: 13 }}>{tr('{0}종목', [x.items.length])}</div></div>
               <b>{mmss(sessionSeconds(x))}</b>
             </div>
           ))}
@@ -551,11 +578,11 @@ export function AnalysisDetail({ kind }: { kind: string }) {
       return (
         <Card>
           <table className="tbl">
-            <thead><tr><th>월</th><th className="r">시간</th><th className="r">볼륨(kg)</th><th className="r">횟수</th></tr></thead>
+            <thead><tr><th>{tr('월')}</th><th className="r">{tr('시간')}</th><th className="r">{tr('볼륨(kg)')}</th><th className="r">{tr('횟수')}</th></tr></thead>
             <tbody>
               {rows.map(({ d, m }) => (
                 <tr key={d.getTime()}>
-                  <td>{d.getMonth() + 1}월</td>
+                  <td>{monthName(d)}</td>
                   <td className="r">{m.seconds ? hm(m.seconds) : '-'}</td>
                   <td className="r">{m.volume ? comma(m.volume) : '-'}</td>
                   <td className="r">{m.count || '-'}</td>
@@ -573,7 +600,7 @@ export function AnalysisDetail({ kind }: { kind: string }) {
         <>
           <Card>
             <RoundBars items={days.map((d) => ({ label: mdDash(d), value: kcalOn(s, ymd(d)) }))} todayIndex={days.length - 1} avg={target || undefined} />
-            <p className="muted" style={{ fontSize: 12 }}>점선은 목표 열량({comma(target)}kcal)이에요</p>
+            <p className="muted" style={{ fontSize: 12 }}>{tr('점선은 목표 열량({0}kcal)이에요', [comma(target)])}</p>
           </Card>
         </>
       )
@@ -581,7 +608,7 @@ export function AnalysisDetail({ kind }: { kind: string }) {
     return (
       <Card>
         <table className="tbl">
-          <thead><tr><th>날짜</th><th className="r">탄수</th><th className="r">단백</th><th className="r">지방</th><th className="r">kcal</th></tr></thead>
+          <thead><tr><th>{tr('날짜')}</th><th className="r">{tr('탄수')}</th><th className="r">{tr('단백')}</th><th className="r">{tr('지방')}</th><th className="r">kcal</th></tr></thead>
           <tbody>
             {days.map((d) => {
               const m = macrosOn(s, d, d)
@@ -603,7 +630,7 @@ export function AnalysisDetail({ kind }: { kind: string }) {
 
   return (
     <>
-      <TopBar title={titles[kind] ?? '상세'} back />
+      <TopBar title={titles[kind] ?? tr('상세')} back />
       <Page>{body}</Page>
     </>
   )

@@ -1,4 +1,5 @@
 // AI 추천 오늘의 운동 선택 화면. 추천 목록에서 고른 운동으로 바로 운동을 시작한다.
+import { tr } from '../lib/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { actions, exName, useAppState } from '../store'
 import { useNav } from '../nav'
@@ -49,20 +50,20 @@ export function AiRecommend() {
 
   return (
     <>
-      <TopBar title="AI 추천 운동" back />
+      <TopBar title={tr('AI 추천 운동')} back />
       <Page fixed>
-        <Card title={`오늘은 ${PART_NAME[rec.part]} 운동`}>
-          <p className="muted">{loading ? 'AI가 추천을 만드는 중이에요' : rec.reason}</p>
+        <Card title={tr('오늘은 {0} 운동', [PART_NAME[rec.part]])}>
+          <p className="muted">{loading ? tr('AI가 추천을 만드는 중이에요') : rec.reason}</p>
           {!loading && (
             <p className="muted" style={{ fontSize: 12 }}>
-              {rec.source === 'ai' ? 'AI 추천' : '기록 기반 추천 (AI는 로그인 후 이용)'}
+              {rec.source === 'ai' ? tr('AI 추천') : tr('기록 기반 추천 (AI는 로그인 후 이용)')}
             </p>
           )}
           <div className="mt12">
             {rec.exercises.map((e) => (
               <label key={e.id} className="row between" style={{ padding: '10px 0' }}>
                 <span>{exName(s, e)}</span>
-                <input type="checkbox" checked={picked.has(e.id)} onChange={() => toggle(e.id)} aria-label={`${exName(s, e)} 선택`} />
+                <input type="checkbox" checked={picked.has(e.id)} onChange={() => toggle(e.id)} aria-label={tr('{0} 선택', [exName(s, e)])} />
               </label>
             ))}
           </div>
@@ -70,7 +71,7 @@ export function AiRecommend() {
       </Page>
       <div className="bottom-fixed" style={{ position: 'absolute', left: 0, right: 0, bottom: 'var(--footer-h)' }}>
         <button className="btn" disabled={loading || picked.size === 0} onClick={start}>
-          {picked.size}개 운동으로 시작하기
+          {tr('{0}개 운동으로 시작하기', [picked.size])}
         </button>
       </div>
     </>

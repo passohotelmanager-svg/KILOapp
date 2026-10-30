@@ -1,6 +1,8 @@
 // 날짜 유틸. 한 주는 월요일 시작으로 고정한다 (PRD 7.10).
+import { getLang, lazy, tr } from './i18n'
 
-const DAY_KO = ['일', '월', '화', '수', '목', '금', '토']
+const DAY_KO = lazy(['일', '월', '화', '수', '목', '금', '토'])
+const MONTH_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export function ymd(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -40,10 +42,16 @@ export function dayName(d: Date): string {
 }
 
 // 월~일 순서의 요일 머리글
-export const WEEK_HEADERS = ['월', '화', '수', '목', '금', '토', '일']
+export const WEEK_HEADERS = lazy(['월', '화', '수', '목', '금', '토', '일'])
 
 export function mdLabel(d: Date): string {
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`
+  if (getLang() === 'en') return `${MONTH_EN[d.getMonth()]} ${d.getDate()}`
+  return tr('{0}월 {1}일', [d.getMonth() + 1, d.getDate()])
+}
+
+// 월 이름만: 10월 / Oct
+export function monthName(d: Date): string {
+  return getLang() === 'en' ? MONTH_EN[d.getMonth()] : tr('{0}월', [d.getMonth() + 1])
 }
 
 export function mdDash(d: Date): string {
@@ -59,7 +67,8 @@ export function weekLabel(start: Date): string {
 }
 
 export function monthLabel(d: Date): string {
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월`
+  if (getLang() === 'en') return `${MONTH_EN[d.getMonth()]} ${d.getFullYear()}`
+  return tr('{0}년 {1}월', [d.getFullYear(), d.getMonth() + 1])
 }
 
 export function isFuture(d: Date, today = new Date()): boolean {
@@ -80,12 +89,12 @@ export function ageFrom(birth: string, today = new Date()): number {
 // 커뮤니티 작성 경과 시간 표시 (PRD 7.9)
 export function timeAgo(at: number, now = Date.now()): string {
   const sec = Math.floor((now - at) / 1000)
-  if (sec < 60) return '방금 전'
+  if (sec < 60) return tr('방금 전')
   const min = Math.floor(sec / 60)
-  if (min < 60) return `${min}분 전`
+  if (min < 60) return tr('{0}분 전', [min])
   const hour = Math.floor(min / 60)
-  if (hour < 24) return `${hour}시간 전`
+  if (hour < 24) return tr('{0}시간 전', [hour])
   const day = Math.floor(hour / 24)
-  if (day < 7) return `${day}일 전`
+  if (day < 7) return tr('{0}일 전', [day])
   return mdLabel(new Date(at))
 }

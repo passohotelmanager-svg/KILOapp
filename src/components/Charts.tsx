@@ -1,4 +1,5 @@
 // SVG 차트 모음: 누적 막대, 단순 막대, 도넛, 인체 그림
+import { tr } from '../lib/i18n'
 import { useState } from 'react'
 import { vol, comma, pct } from '../lib/format'
 
@@ -30,7 +31,7 @@ export function StackedBars({ bars, dim }: { bars: StackBar[]; dim: string | nul
 
   return (
     <div style={{ position: 'relative' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="부위별 볼륨 누적 막대 그래프">
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={tr('부위별 볼륨 누적 막대 그래프')}>
         <line x1="0" x2={W} y1={H - bottom} y2={H - bottom} stroke="#e5e8eb" />
         {bars.map((b, i) => {
           const total = totals[i]
@@ -83,7 +84,7 @@ function Tooltip({ bar, left }: { bar: StackBar; left: number }) {
   return (
     <div className="tip" style={{ top: 0, left: `${pos}%` }} role="status">
       <b>{bar.label}</b>
-      {parts.length === 0 && <div>기록 없음</div>}
+      {parts.length === 0 && <div>{tr('기록 없음')}</div>}
       {parts.map((s) => (
         <div key={s.key}>
           {s.label} {comma(s.value)}kg ({pct(s.value, total)}%)
@@ -92,7 +93,7 @@ function Tooltip({ bar, left }: { bar: StackBar; left: number }) {
       {parts.length > 0 && (
         <>
           <hr />
-          <div>합계 {comma(total)}kg</div>
+          <div>{tr('합계 {0}kg', [comma(total)])}</div>
         </>
       )}
     </div>
@@ -124,11 +125,11 @@ export function RoundBars({
   const bw = Math.min(26, slot * 0.55)
   const avgY = avg ? H - bottom - (avg / max) * plotH : null
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`막대 그래프${unit ? ` (${unit})` : ''}`}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={tr('막대 그래프{0}', [unit ? ` (${unit})` : ''])}>
       {avgY !== null && (
         <>
           <line x1="0" x2={W} y1={avgY} y2={avgY} stroke="#8b95a1" strokeDasharray="4 4" />
-          <text x={W - 2} y={avgY - 4} textAnchor="end" fontSize="10" fill="#8b95a1">평균</text>
+          <text x={W - 2} y={avgY - 4} textAnchor="end" fontSize="10" fill="#8b95a1">{tr('평균')}</text>
         </>
       )}
       {items.map((it, i) => {
@@ -142,7 +143,7 @@ export function RoundBars({
             )}
             <text x={cx} y={H - 16} textAnchor="middle" fontSize="10" fill="#8b95a1">{it.label}</text>
             {isToday && (
-              <text x={cx} y={H - 4} textAnchor="middle" fontSize="10" fontWeight="700" fill="#191f28">오늘</text>
+              <text x={cx} y={H - 4} textAnchor="middle" fontSize="10" fontWeight="700" fill="#191f28">{tr('오늘')}</text>
             )}
           </g>
         )
@@ -158,7 +159,7 @@ export function Donut({ slices, size = 150 }: { slices: { value: number; color: 
   const c = 2 * Math.PI * r
   let acc = 0
   return (
-    <svg viewBox="0 0 150 150" width={size} height={size} role="img" aria-label="영양소 비율 도넛 차트">
+    <svg viewBox="0 0 150 150" width={size} height={size} role="img" aria-label={tr('영양소 비율 도넛 차트')}>
       <circle cx="75" cy="75" r={r} fill="none" stroke="#f6f1f0" strokeWidth="26" />
       {total > 0 &&
         slices.map((s, i) => {
@@ -225,7 +226,7 @@ export function BodyMap({ volumes }: { volumes: Record<string, number> }) {
   }
   const fig = (shapes: { part: string; d: string }[], title: string) => (
     <div className="center">
-      <svg viewBox="0 0 120 190" width="120" role="img" aria-label={`${title} 근육 피로도`}>
+      <svg viewBox="0 0 120 190" width="120" role="img" aria-label={tr('{0} 근육 피로도', [title])}>
         <circle cx="60" cy="22" r="14" fill="#d5dbe1" />
         <rect x="52" y="34" width="16" height="8" fill="#d5dbe1" />
         {shapes.map((s, i) => (
@@ -237,8 +238,8 @@ export function BodyMap({ volumes }: { volumes: Record<string, number> }) {
   )
   return (
     <div className="body-figs">
-      {fig(FRONT, '앞')}
-      {fig(BACK, '뒤')}
+      {fig(FRONT, tr('앞'))}
+      {fig(BACK, tr('뒤'))}
     </div>
   )
 }

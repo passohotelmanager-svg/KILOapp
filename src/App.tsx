@@ -1,3 +1,4 @@
+import { lazy, tr } from './lib/i18n'
 import { useEffect } from 'react'
 import { NavProvider, useNav, type Tab } from './nav'
 import { actions, useAppState, activeSession } from './store'
@@ -17,12 +18,12 @@ import { Nutrition, MealEdit, MealAlbum } from './screens/Nutrition'
 import { Community } from './screens/Community'
 import { Profile, Settings, Account, BodyInfo, Memos } from './screens/Profile'
 
-const TABS: { tab: Tab; label: string; icon: string }[] = [
+const TABS: { tab: Tab; label: string; icon: string }[] = lazy([
   { tab: 'today', label: '투데이', icon: 'today' },
   { tab: 'community', label: '커뮤니티', icon: 'community' },
   { tab: 'analysis', label: '분석', icon: 'analysis' },
   { tab: 'profile', label: '프로필', icon: 'profile' },
-]
+])
 
 function Screen() {
   const { stack } = useNav()
@@ -59,8 +60,8 @@ function MiniBar() {
   if (!ss || (nav.tab === 'today' && top === 'workout')) return null
   return (
     <button className="minibar" onClick={nav.openWorkout}>
-      <span>운동 중</span>
-      <small>{left !== null ? `휴식 남은 시간 ${mmss(left)}` : '기록 화면으로 돌아가기'}</small>
+      <span>{tr('운동 중')}</span>
+      <small>{left !== null ? tr('휴식 남은 시간 {0}', [mmss(left)]) : tr('기록 화면으로 돌아가기')}</small>
     </button>
   )
 }
@@ -77,7 +78,7 @@ function useReminder() {
       const st = s.settings
       if (st.remindDays.includes(now.getDay()) && hhmm === st.remindTime && s.lastReminderDate !== today) {
         actions.setReminderDate(today)
-        if (st.notifConsent) showNotification('KILO', '오늘 운동할 시간이에요')
+        if (st.notifConsent) showNotification('KILO', tr('오늘 운동할 시간이에요'))
       }
     }, 20_000)
     return () => window.clearInterval(t)
@@ -91,7 +92,7 @@ function Main() {
     <div className="shell">
       <Screen key={nav.scrollKey} />
       <MiniBar />
-      <nav className="footer" aria-label="주요 메뉴">
+      <nav className="footer" aria-label={tr('주요 메뉴')}>
         {TABS.map((t) => (
           <button key={t.tab} className={nav.tab === t.tab ? 'on' : ''} onClick={() => nav.switchTab(t.tab)} aria-current={nav.tab === t.tab ? 'page' : undefined}>
             <Icon name={t.icon} size={24} />

@@ -1,6 +1,8 @@
 // 볼륨, 1RM, 영양 계산 (PRD 8.1, 8.3)
 import type { Exercise, Goal, PartCode, Profile, Session, SetRec, SubPartCode } from '../types'
+import { lazy } from './i18n'
 import { ageFrom } from './dates'
+import { CARDIO_MET, CARDIO_MET_DEFAULT, STRENGTH_MET } from './constants'
 
 // 세트 하나의 무게 볼륨. 무게 유형만 볼륨으로 센다.
 export function setVolume(ex: Exercise, s: SetRec): number {
@@ -101,6 +103,60 @@ export function aggregate(
   return agg
 }
 
+export interface CardioBurn {
+  total: number // 총 소모 kcal
+  rows: { exercise: Exercise; minutes: number; kcal: number }[] // 소모 많은 순
+}
+
+// 기간 내 유산소 운동별 진행 시간과 소모 칼로리
+export function cardioBurn(
+  sessions: Session[],
+  from: string,
+  to: string,
+  lookup: (id: string) => Exercise | undefined,
+  weightKg: number,
+): CardioBurn {
+  const minutes: Record<string, { exercise: Exercise; minutes: number }> = {}
+  for (const ss of sessions) {
+    if (ss.date < from || ss.date > to) continue
+    for (const item of ss.items) {
+      const ex = lookup(item.exerciseId)
+      if (!ex || ex.part !== 'cardio') continue
+      for (const s of item.sets) {
+        if (!setFilled(ex, s) || s.minutes <= 0) continue
+        const row = (minutes[ex.id] ??= { exercise: ex, minutes: 0 })
+        row.minutes += s.minutes
+      }
+    }
+  }
+  const rows = Object.values(minutes)
+    .map((r) => ({ ...r, kcal: Math.round((CARDIO_MET[r.exercise.id] ?? CARDIO_MET_DEFAULT) * weightKg * (r.minutes / 60)) }))
+    .sort((a, b) => b.kcal - a.kcal)
+  return { total: rows.reduce((a, r) => a + r.kcal, 0), rows }
+}
+
+// 기간 내 운동 전체 소모 칼로리 추정: 유산소는 종목별 MET, 나머지 시간은 근력 운동 MET로 계산
+export function workoutKcal(
+  sessions: Session[],
+  from: string,
+  to: string,
+  lookup: (id: string) => Exercise | undefined,
+  weightKg: number,
+): number {
+  const cardio = cardioBurn(sessions, from, to, lookup, weightKg)
+  let strengthSec = 0
+  for (const ss of sessions) {
+    if (ss.date < from || ss.date > to) continue
+    let cardioMin = 0
+    for (const item of ss.items) {
+      const ex = lookup(item.exerciseId)
+      if (ex?.part === 'cardio') for (const s of item.sets) cardioMin += s.minutes
+    }
+    strengthSec += Math.max(0, sessionSeconds(ss) - cardioMin * 60)
+  }
+  return cardio.total + Math.round(STRENGTH_MET * weightKg * (strengthSec / 3600))
+}
+
 // 세션 길이(초). 진행 중이면 현재까지.
 export function sessionSeconds(ss: Session, now = Date.now()): number {
   const end = ss.endedAt ?? now
@@ -129,14 +185,14 @@ export function best1RM(sessions: Session[], exerciseId: string): number {
 // 세트 어시스턴트: 메인 무게 기준으로 세트 구성을 만든다 (2.5kg 단위 반올림)
 export type AssistPreset = 'basic' | 'up' | 'down' | 'five' | 'top' | 'backoff'
 
-export const ASSIST_PRESETS: { id: AssistPreset; label: string; desc: string }[] = [
+export const ASSIST_PRESETS: { id: AssistPreset; label: string; desc: string }[] = lazy([
   { id: 'basic', label: '기본', desc: '모든 세트가 같은 무게로 구성돼요.' },
   { id: 'up', label: '점점 강하게', desc: '70%에서 시작해 메인 무게까지 단계적으로 올려요.' },
   { id: 'down', label: '점점 약하게', desc: '메인 무게로 시작해 70%까지 내려가요.' },
   { id: 'five', label: '5×5 스트렝스', desc: '메인 무게로 5세트 × 5회를 해요.' },
   { id: 'top', label: '탑세트', desc: '무게를 올려 마지막 한 세트에서 오늘의 최고 기록에 도전해요.' },
   { id: 'backoff', label: '백오프', desc: '탑세트를 먼저 하고, 이후 80% 무게로 볼륨을 채워요.' },
-]
+])
 
 const round25 = (w: number) => Math.max(0, Math.round(w / 2.5) * 2.5)
 

@@ -40,6 +40,12 @@ export function workoutDays(s: AppState): Set<string> {
   return new Set(recordedSessions(s).map((x) => x.date))
 }
 
+// 해당 달에 운동한 날 수 (같은 날 여러 번 해도 1번으로 센다)
+export function monthDoneCount(s: AppState, month: Date): number {
+  const prefix = ymd(startOfMonth(month)).slice(0, 7)
+  return new Set(recordedSessions(s).filter((x) => x.date.startsWith(prefix)).map((x) => x.date)).size
+}
+
 // 이번 주(월~일) 운동한 날 수
 export function weekDoneCount(s: AppState, today = new Date()): number {
   const start = startOfWeek(today)

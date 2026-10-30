@@ -1,4 +1,5 @@
 // 온보딩 10단계 (PRD 7.3)
+import { tr } from '../lib/i18n'
 import { useMemo, useState } from 'react'
 import { actions, nicknameTaken, useAppState } from '../store'
 import { Icon } from '../components/Icon'
@@ -16,7 +17,7 @@ const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 function Back({ onBack }: { onBack: () => void }) {
   return (
     <div style={{ height: 52, display: 'flex', alignItems: 'center', marginLeft: -8 }}>
-      <button className="iconbtn" aria-label="뒤로가기" onClick={onBack}>
+      <button className="iconbtn" aria-label={tr('뒤로가기')} onClick={onBack}>
         <Icon name="back" />
       </button>
     </div>
@@ -50,7 +51,7 @@ export function Onboarding() {
 
   const thisYear = new Date().getFullYear()
   const days = new Date(y, m, 0).getDate()
-  const dayOpts = useMemo(() => range(1, days, (n) => `${n}일`), [days])
+  const dayOpts = useMemo(() => range(1, days, (n) => tr('{0}일', [n])), [days])
   const next = () => setStep((n) => n + 1)
   const prev = () => setStep((n) => Math.max(1, n - 1))
   const clampedDay = Math.min(d, days)
@@ -72,8 +73,8 @@ export function Onboarding() {
 
   const nickErr = (() => {
     const t = nick.trim()
-    if (t.length > 0 && (t.length < 2 || t.length > 12)) return '2~12자로 입력해주세요'
-    if (t && nicknameTaken(s, t)) return '이미 사용 중인 닉네임이에요'
+    if (t.length > 0 && (t.length < 2 || t.length > 12)) return tr('2~12자로 입력해주세요')
+    if (t && nicknameTaken(s, t)) return tr('이미 사용 중인 닉네임이에요')
     return ''
   })()
 
@@ -93,18 +94,19 @@ export function Onboarding() {
       <div className="start-bg" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0 20px' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <p style={{ fontWeight: 800, letterSpacing: 4, color: '#c4392f' }}>KILO</p>
-          <h1 className="h1" style={{ fontSize: 30, marginTop: 8 }}>기록을 습관으로,<br />작심삼일 끝!</h1>
-          <p className="sub">세트 기록부터 휴식 타이머, 볼륨 통계, 영양 기록까지 한 번에 관리해요</p>
+          <h1 className="h1" style={{ fontSize: 30, marginTop: 8 }}>{tr('기록을 습관으로,')}<br />{tr('작심삼일 끝!')}</h1>
+          <p className="sub">{tr('세트 기록부터 휴식 타이머, 볼륨 통계, 영양 기록까지 한 번에 관리해요')}</p>
           {/* 실제 사용자 데이터가 쌓이기 전에는 지속률 수치를 표시하지 않는다 */}
         </div>
         <div style={{ paddingBottom: 'calc(20px + env(safe-area-inset-bottom))', textAlign: 'center' }}>
-          <button className="btn" onClick={next}>시작하기</button>
+          <button className="btn" onClick={next}>{tr('시작하기')}</button>
           <button
             className="link mt16"
             style={{ background: 'none' }}
-            onClick={() => show('이 기기에는 저장된 계정이 없어요. 시작하기로 새로 만들어주세요')}
+            onClick={() => show(tr('이 기기에는 저장된 계정이 없어요. 시작하기로 새로 만들어주세요'))}
           >
-            이미 계정이 있어요
+            
+            {tr('이미 계정이 있어요')}
           </button>
         </div>
         {toast}
@@ -114,14 +116,14 @@ export function Onboarding() {
 
   if (step === 2) {
     const goals: { v: Goal; t: string; d: string }[] = [
-      { v: 'lose', t: '체중 감량', d: '지방을 줄이고 가벼워지고 싶어요' },
-      { v: 'strength', t: '근력 증가', d: '더 무겁게, 더 강하게 만들고 싶어요' },
-      { v: 'health', t: '건강 관리', d: '꾸준히 건강한 몸을 유지하고 싶어요' },
+      { v: 'lose', t: tr('체중 감량'), d: tr('지방을 줄이고 가벼워지고 싶어요') },
+      { v: 'strength', t: tr('근력 증가'), d: tr('더 무겁게, 더 강하게 만들고 싶어요') },
+      { v: 'health', t: tr('건강 관리'), d: tr('꾸준히 건강한 몸을 유지하고 싶어요') },
     ]
     return shell(
       <>
-        <h1 className="h1">KILO에서 어떤 변화를<br />기대하나요?</h1>
-        <p className="sub">목표를 이룰 수 있도록 KILO가 도와드릴게요</p>
+        <h1 className="h1">{tr('KILO에서 어떤 변화를')}<br />{tr('기대하나요?')}</h1>
+        <p className="sub">{tr('목표를 이룰 수 있도록 KILO가 도와드릴게요')}</p>
         <div className="mt24">
           {goals.map((g) => (
             <button key={g.v} className={`pick ${goal === g.v ? 'on' : ''}`} onClick={() => setGoal(g.v)}>
@@ -131,20 +133,20 @@ export function Onboarding() {
           ))}
         </div>
       </>,
-      <Footer label="다음" disabled={!goal} onClick={next} />,
+      <Footer label={tr('다음')} disabled={!goal} onClick={next} />,
     )
   }
 
   if (step === 3) {
     return shell(
       <>
-        <h1 className="h1">일주일에 몇 번<br />운동할 수 있나요?</h1>
-        <p className="sub">현실적으로 가능한 횟수로 선택해주세요</p>
-        <div className="slider-dots" role="radiogroup" aria-label="주간 운동 횟수">
+        <h1 className="h1">{tr('일주일에 몇 번')}<br />{tr('운동할 수 있나요?')}</h1>
+        <p className="sub">{tr('현실적으로 가능한 횟수로 선택해주세요')}</p>
+        <div className="slider-dots" role="radiogroup" aria-label={tr('주간 운동 횟수')}>
           <div className="slider-line" />
           {[1, 2, 3, 4, 5, 6, 7].map((n) => (
             <div key={n} style={{ position: 'relative' }}>
-              {n === 3 && <span className="bubble-rec" style={{ left: '50%' }}>추천</span>}
+              {n === 3 && <span className="bubble-rec" style={{ left: '50%' }}>{tr('추천')}</span>}
               <button className={weekly === n ? 'on' : ''} role="radio" aria-checked={weekly === n} onClick={() => setWeekly(n)}>
                 {n}
               </button>
@@ -153,34 +155,34 @@ export function Onboarding() {
         </div>
         <div className="hintbox">{WEEKLY_HINT[weekly]}</div>
       </>,
-      <Footer label="다음" onClick={next} />,
+      <Footer label={tr('다음')} onClick={next} />,
     )
   }
 
   if (step === 4) {
     return shell(
       <>
-        <h1 className="h1">생년월일을<br />입력해주세요</h1>
-        <p className="sub">연령에 맞는 운동 분석을 위해 필요해요</p>
+        <h1 className="h1">{tr('생년월일을')}<br />{tr('입력해주세요')}</h1>
+        <p className="sub">{tr('연령에 맞는 운동 분석을 위해 필요해요')}</p>
         <div className="wheels">
-          <Wheel options={range(thisYear - 90, thisYear - 10, (n) => `${n}년`)} value={y} onChange={setY} />
-          <Wheel options={range(1, 12, (n) => `${n}월`)} value={m} onChange={setM} />
+          <Wheel options={range(thisYear - 90, thisYear - 10, (n) => tr('{0}년', [n]))} value={y} onChange={setY} />
+          <Wheel options={range(1, 12, (n) => tr('{0}월', [n]))} value={m} onChange={setM} />
           <Wheel options={dayOpts} value={clampedDay} onChange={setD} />
         </div>
       </>,
-      <Footer label="다음" onClick={next} />,
+      <Footer label={tr('다음')} onClick={next} />,
     )
   }
 
   if (step === 5) {
     return shell(
       <>
-        <h1 className="h1">성별을 알려주세요</h1>
-        <p className="sub">신체 특성에 맞는 운동 분석에 활용돼요</p>
+        <h1 className="h1">{tr('성별을 알려주세요')}</h1>
+        <p className="sub">{tr('신체 특성에 맞는 운동 분석에 활용돼요')}</p>
         <div className="row gap12 mt24">
           {(['male', 'female'] as Sex[]).map((v) => (
             <button key={v} className={`square-pick ${sex === v ? 'on' : ''}`} onClick={() => setSex(v)}>
-              <span>{v === 'male' ? '남성' : '여성'}</span>
+              <span>{v === 'male' ? tr('남성') : tr('여성')}</span>
               <span style={{ alignSelf: 'flex-end' }}>
                 <Icon name={v} size={32} />
               </span>
@@ -188,37 +190,37 @@ export function Onboarding() {
           ))}
         </div>
       </>,
-      <Footer label="다음" disabled={!sex} onClick={next} />,
+      <Footer label={tr('다음')} disabled={!sex} onClick={next} />,
     )
   }
 
   if (step === 6) {
     return shell(
       <>
-        <h1 className="h1">최근 측정한 키와<br />체중을 입력해주세요</h1>
-        <p className="sub">현재 몸 상태에 맞는 분석에 활용돼요</p>
+        <h1 className="h1">{tr('최근 측정한 키와')}<br />{tr('체중을 입력해주세요')}</h1>
+        <p className="sub">{tr('현재 몸 상태에 맞는 분석에 활용돼요')}</p>
         <div className="wheels">
           <Wheel options={range(120, 220)} value={height} onChange={setHeight} unit="cm" />
           <Wheel options={range(30, 200)} value={kgInt} onChange={setKgInt} />
           <Wheel options={range(0, 9, (n) => `.${n}`)} value={kgDec} onChange={setKgDec} unit="kg" />
         </div>
       </>,
-      <Footer label="다음" onClick={next} />,
+      <Footer label={tr('다음')} onClick={next} />,
     )
   }
 
   if (step === 7) {
     return shell(
       <>
-        <h1 className="h1">입력해주신 정보를 바탕으로<br />매주 맞춤 리포트를 보내드릴게요</h1>
-        <p className="sub">운동 변화와 기록 흐름을 한 눈에 확인하세요</p>
+        <h1 className="h1">{tr('입력해주신 정보를 바탕으로')}<br />{tr('매주 맞춤 리포트를 보내드릴게요')}</h1>
+        <p className="sub">{tr('운동 변화와 기록 흐름을 한 눈에 확인하세요')}</p>
         <div className="reports" aria-hidden="true">
-          <div style={{ left: 0, top: 50, transform: 'rotate(-8deg)', opacity: 0.6 }}>주간 볼륨</div>
-          <div style={{ left: 60, top: 36, transform: 'rotate(5deg)', opacity: 0.8 }}>운동 시간</div>
-          <div style={{ left: 30, top: 10 }}>이번 주 요약</div>
+          <div style={{ left: 0, top: 50, transform: 'rotate(-8deg)', opacity: 0.6 }}>{tr('주간 볼륨')}</div>
+          <div style={{ left: 60, top: 36, transform: 'rotate(5deg)', opacity: 0.8 }}>{tr('운동 시간')}</div>
+          <div style={{ left: 30, top: 10 }}>{tr('이번 주 요약')}</div>
         </div>
       </>,
-      <Footer label="다음" onClick={next} />,
+      <Footer label={tr('다음')} onClick={next} />,
     )
   }
 
@@ -230,14 +232,14 @@ export function Onboarding() {
     }
     return shell(
       <>
-        <h1 className="h1">꾸준한 운동 습관을 만들 수 있도록<br />필요한 순간에 알려드릴게요</h1>
-        <p className="sub">휴식 종료 알람과 운동 리마인더에 알림 권한을 사용해요. 허용하지 않아도 앱 화면 안에서 소리와 진동으로 알려드려요.</p>
+        <h1 className="h1">{tr('꾸준한 운동 습관을 만들 수 있도록')}<br />{tr('필요한 순간에 알려드릴게요')}</h1>
+        <p className="sub">{tr('휴식 종료 알람과 운동 리마인더에 알림 권한을 사용해요. 허용하지 않아도 앱 화면 안에서 소리와 진동으로 알려드려요.')}</p>
         <div className="center mt24" style={{ color: 'var(--primary)' }}>
           <Icon name="bell" size={120} strokeWidth={1.2} />
         </div>
       </>,
       <div className="bottom-fixed">
-        <button className="btn" onClick={agree}>좋아요</button>
+        <button className="btn" onClick={agree}>{tr('좋아요')}</button>
         <button
           className="link mt12"
           style={{ display: 'block', margin: '12px auto 0', background: 'none' }}
@@ -246,7 +248,8 @@ export function Onboarding() {
             next()
           }}
         >
-          나중에 할게요
+          
+          {tr('나중에 할게요')}
         </button>
       </div>,
     )
@@ -260,12 +263,12 @@ export function Onboarding() {
     )
     return shell(
       <>
-        <h1 className="h1">로그인하고<br />기록을 시작해요</h1>
-        <p className="sub">이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요</p>
+        <h1 className="h1">{tr('로그인하고')}<br />{tr('기록을 시작해요')}</h1>
+        <p className="sub">{tr('이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요')}</p>
         <div className="mt24">
-          {btn('google', 'Google로 계속하기')}
-          {btn('facebook', 'Facebook으로 계속하기')}
-          {isIOS && btn('apple', 'Apple로 계속하기')}
+          {btn('google', tr('Google로 계속하기'))}
+          {btn('facebook', tr('Facebook으로 계속하기'))}
+          {isIOS && btn('apple', tr('Apple로 계속하기'))}
         </div>
       </>,
     )
@@ -276,13 +279,13 @@ export function Onboarding() {
   const ok = t.length >= 2 && t.length <= 12 && !nickErr
   return shell(
     <>
-      <h1 className="h1">커뮤니티에서 사용할<br />닉네임을 정해주세요</h1>
-      <p className="sub">언제든 프로필에서 바꿀 수 있어요</p>
-      <input className="input mt24" value={nick} maxLength={12} placeholder="닉네임 (2~12자)" onChange={(e) => setNick(e.target.value)} aria-label="닉네임" />
-      <p className="sub" style={{ color: nickErr ? 'var(--dec)' : undefined }}>{nickErr || '중복되는 닉네임은 사용할 수 없어요'}</p>
+      <h1 className="h1">{tr('커뮤니티에서 사용할')}<br />{tr('닉네임을 정해주세요')}</h1>
+      <p className="sub">{tr('언제든 프로필에서 바꿀 수 있어요')}</p>
+      <input className="input mt24" value={nick} maxLength={12} placeholder={tr('닉네임 (2~12자)')} onChange={(e) => setNick(e.target.value)} aria-label={tr('닉네임')} />
+      <p className="sub" style={{ color: nickErr ? 'var(--dec)' : undefined }}>{nickErr || tr('중복되는 닉네임은 사용할 수 없어요')}</p>
     </>,
     <Footer
-      label="시작하기"
+      label={tr('시작하기')}
       disabled={!ok}
       onClick={() => {
         actions.setNickname(t)

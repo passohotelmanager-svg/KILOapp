@@ -1,4 +1,5 @@
 // 앱 전역 타입 정의 (PRD 8.2 데이터 모델 기준)
+import type { Lang } from './lib/i18n'
 
 export type PartCode = 'chest' | 'back' | 'shoulders' | 'legs' | 'arms' | 'abs' | 'cardio'
 export type SubPartCode = 'lats_mid' | 'lower' | 'traps' | 'biceps' | 'triceps' | 'forearms'
@@ -106,6 +107,7 @@ export interface Profile {
 
 export interface Settings {
   nameLang: NameLang
+  lang: Lang // 화면 언어
   restDefault: number
   remindOn: boolean
   remindDays: number[] // 0=일 ~ 6=토

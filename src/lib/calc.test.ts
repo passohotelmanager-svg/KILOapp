@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { vol } from './format'
-import { aggregate, bmr, buildAssist, dailyTarget, est1RM, macroKcal, setVolume, tdee } from './calc'
+import { aggregate, bmr, buildAssist, cardioBurn, dailyTarget, est1RM, macroKcal, setVolume, tdee } from './calc'
 import { startOfWeek, ymd, timeAgo } from './dates'
 import type { Exercise, Profile, Session } from '../types'
 
@@ -76,5 +76,32 @@ describe('세트 어시스턴트', () => {
   })
   it('워밍업 세트는 볼륨에서 제외', () => {
     expect(setVolume(bench, { ...set(100, 5), warmup: true })).toBe(0)
+  })
+})
+
+describe('유산소 소모 칼로리', () => {
+  const run: Exercise = { id: 'cardio-04', nameKo: '야외 달리기', nameEn: 'Outdoor Run', part: 'cardio', subPart: null, type: 'cardio_distance', builtin: true }
+  const walk: Exercise = { id: 'cardio-05', nameKo: '야외 걷기', nameEn: 'Outdoor Walk', part: 'cardio', subPart: null, type: 'cardio_distance', builtin: true }
+  const cardioSet = (distanceKm: number, minutes: number) => ({ ...set(0, 0), distanceKm, minutes })
+  const ss = (date: string, id: string, minutes: number): Session => ({
+    id: date + id, date, startedAt: 0, endedAt: 1, memo: '',
+    items: [{ exerciseId: id, sets: [cardioSet(3, minutes)] }],
+  })
+  const lookup = (id: string) => [run, walk].find((e) => e.id === id)
+
+  it('MET x 체중 x 시간', () => {
+    // 달리기 MET 9.8, 70kg, 30분 = 343kcal
+    const r = cardioBurn([ss('2026-10-26', 'cardio-04', 30)], '2026-10-26', '2026-11-01', lookup, 70)
+    expect(r.total).toBe(343)
+  })
+  it('운동별로 분을 합치고 소모가 큰 순으로 정렬', () => {
+    const r = cardioBurn(
+      [ss('2026-10-26', 'cardio-05', 60), ss('2026-10-27', 'cardio-04', 20), ss('2026-10-28', 'cardio-04', 10)],
+      '2026-10-26', '2026-11-01', lookup, 70,
+    )
+    expect(r.rows.map((x) => [x.exercise.id, x.minutes])).toEqual([['cardio-04', 30], ['cardio-05', 60]])
+  })
+  it('기간 밖 기록은 제외', () => {
+    expect(cardioBurn([ss('2026-10-20', 'cardio-04', 30)], '2026-10-26', '2026-11-01', lookup, 70).total).toBe(0)
   })
 })

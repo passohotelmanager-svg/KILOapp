@@ -1,4 +1,5 @@
 // 커뮤니티: 말풍선 코멘트 (F-48, 7.9)
+import { tr } from '../lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { actions, useAppState } from '../store'
 import { Sheet, TopBar, useLongPress, useToast } from '../components/ui'
@@ -48,14 +49,14 @@ export function Community() {
   const submit = () => {
     const r = actions.postComment(text)
     if (r === 'ok') setText('')
-    else if (r === 'banned') show('사용할 수 없는 표현이 포함되어 있어요')
-    else if (r === 'long') show('100자까지 쓸 수 있어요')
-    else if (r === 'nouser') show('로그인 후 작성할 수 있어요')
+    else if (r === 'banned') show(tr('사용할 수 없는 표현이 포함되어 있어요'))
+    else if (r === 'long') show(tr('100자까지 쓸 수 있어요'))
+    else if (r === 'nouser') show(tr('로그인 후 작성할 수 있어요'))
   }
 
   return (
     <>
-      <TopBar title="커뮤니티" />
+      <TopBar title={tr('커뮤니티')} />
       <div
         className="chat"
         ref={box}
@@ -64,7 +65,7 @@ export function Community() {
           if ((e.currentTarget.scrollTop ?? 0) < 20 && visible < list.length) setVisible((v) => v + 20)
         }}
       >
-        {shown.length === 0 && <div className="empty">첫 코멘트를 남겨보세요</div>}
+        {shown.length === 0 && <div className="empty">{tr('첫 코멘트를 남겨보세요')}</div>}
         {shown.map((c) => (
           <Bubble key={c.id} c={c} mine={c.userId === me} now={now} onMenu={setMenu} />
         ))}
@@ -76,21 +77,21 @@ export function Community() {
           submit()
         }}
       >
-        <input value={text} maxLength={100} onChange={(e) => setText(e.target.value)} placeholder="짧은 코멘트를 남겨보세요 (100자)" aria-label="코멘트 입력" />
-        <button type="submit" disabled={!text.trim()}>등록</button>
+        <input value={text} maxLength={100} onChange={(e) => setText(e.target.value)} placeholder={tr('짧은 코멘트를 남겨보세요 (100자)')} aria-label={tr('코멘트 입력')} />
+        <button type="submit" disabled={!text.trim()}>{tr('등록')}</button>
       </form>
 
       {menu && (
         <Sheet onClose={() => setMenu(null)}>
           {menu.userId === me ? (
-            <button className="btn danger" onClick={() => { actions.deleteComment(menu.id); setMenu(null) }}>삭제</button>
+            <button className="btn danger" onClick={() => { actions.deleteComment(menu.id); setMenu(null) }}>{tr('삭제')}</button>
           ) : (
             <>
-              <button className="btn ghost" onClick={() => { actions.reportComment(menu.id); setMenu(null); show('신고가 접수됐어요') }}>신고</button>
-              <button className="btn danger mt8" onClick={() => { actions.blockUser(menu.userId); setMenu(null); show(`${menu.nickname}님을 차단했어요`) }}>이 사용자 차단</button>
+              <button className="btn ghost" onClick={() => { actions.reportComment(menu.id); setMenu(null); show(tr('신고가 접수됐어요')) }}>{tr('신고')}</button>
+              <button className="btn danger mt8" onClick={() => { actions.blockUser(menu.userId); setMenu(null); show(tr('{0}님을 차단했어요', [menu.nickname])) }}>{tr('이 사용자 차단')}</button>
             </>
           )}
-          <button className="btn line mt8" onClick={() => setMenu(null)}>닫기</button>
+          <button className="btn line mt8" onClick={() => setMenu(null)}>{tr('닫기')}</button>
         </Sheet>
       )}
       {toast}

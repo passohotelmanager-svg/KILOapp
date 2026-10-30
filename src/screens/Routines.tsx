@@ -1,4 +1,5 @@
 // 루틴 목록과 편집 (F-01)
+import { tr } from '../lib/i18n'
 import { useState } from 'react'
 import { actions, exName, findExercise, useAppState } from '../store'
 import { useNav } from '../nav'
@@ -12,9 +13,9 @@ export function Routines() {
   const nav = useNav()
   return (
     <>
-      <TopBar title="운동 루틴" back right={<button className="iconbtn" aria-label="루틴 만들기" onClick={() => nav.push('routineEdit')}><Icon name="plus" /></button>} />
+      <TopBar title={tr('운동 루틴')} back right={<button className="iconbtn" aria-label={tr('루틴 만들기')} onClick={() => nav.push('routineEdit')}><Icon name="plus" /></button>} />
       <Page>
-        {s.routines.length === 0 && <div className="empty">아직 루틴이 없어요<br />자주 하는 운동을 루틴으로 만들어보세요</div>}
+        {s.routines.length === 0 && <div className="empty">{tr('아직 루틴이 없어요')}<br />{tr('자주 하는 운동을 루틴으로 만들어보세요')}</div>}
         <div className="list-group">
           {s.routines.map((r) => (
             <div key={r.id} className="list-item">
@@ -22,7 +23,7 @@ export function Routines() {
                 <b>{r.name}</b>
                 <div className="muted" style={{ fontSize: 13 }}>
                   {r.items.map((i) => { const e = findExercise(s, i.exerciseId); return e ? exName(s, e) : '' }).filter(Boolean).slice(0, 3).join(', ')}
-                  {r.items.length > 3 ? ` 외 ${r.items.length - 3}개` : ''}
+                  {r.items.length > 3 ? tr(' 외 {0}개', [r.items.length - 3]) : ''}
                 </div>
               </button>
               <button
@@ -32,7 +33,8 @@ export function Routines() {
                   nav.openWorkout()
                 }}
               >
-                시작
+                
+                {tr('시작')}
               </button>
             </div>
           ))}
@@ -62,8 +64,8 @@ export function RoutineEdit({ id }: { id?: string }) {
   }
 
   const save = () => {
-    if (!r.name.trim()) return show('루틴 이름을 입력해주세요')
-    if (r.items.length === 0) return show('종목을 1개 이상 추가해주세요')
+    if (!r.name.trim()) return show(tr('루틴 이름을 입력해주세요'))
+    if (r.items.length === 0) return show(tr('종목을 1개 이상 추가해주세요'))
     actions.saveRoutine({ ...r, name: r.name.trim() })
     draft = null
     nav.pop()
@@ -71,11 +73,11 @@ export function RoutineEdit({ id }: { id?: string }) {
 
   return (
     <>
-      <TopBar title={id ? '루틴 편집' : '루틴 만들기'} back onBack={() => { draft = null; nav.pop() }} />
+      <TopBar title={id ? tr('루틴 편집') : tr('루틴 만들기')} back onBack={() => { draft = null; nav.pop() }} />
       <Page fixed>
         <div style={{ padding: '0 16px' }}>
-          <p className="field-label">루틴 이름</p>
-          <input className="input" value={r.name} maxLength={20} placeholder="예: 가슴 + 삼두 데이" onChange={(e) => update({ name: e.target.value })} aria-label="루틴 이름" />
+          <p className="field-label">{tr('루틴 이름')}</p>
+          <input className="input" value={r.name} maxLength={20} placeholder={tr('예: 가슴 + 삼두 데이')} onChange={(e) => update({ name: e.target.value })} aria-label={tr('루틴 이름')} />
         </div>
         <div className="list-group">
           {r.items.map((it, idx) => {
@@ -85,10 +87,10 @@ export function RoutineEdit({ id }: { id?: string }) {
               <div className="list-item" key={it.exerciseId}>
                 <div className="grow"><b>{exName(s, e)}</b></div>
                 <div className="row gap8">
-                  <button className="iconbtn" aria-label="세트 수 줄이기" onClick={() => update({ items: r.items.map((x, i) => (i === idx ? { ...x, sets: Math.max(1, x.sets - 1) } : x)) })}><Icon name="minus" size={16} /></button>
-                  <span style={{ minWidth: 40, textAlign: 'center' }}>{it.sets}세트</span>
-                  <button className="iconbtn" aria-label="세트 수 늘리기" onClick={() => update({ items: r.items.map((x, i) => (i === idx ? { ...x, sets: x.sets + 1 } : x)) })}><Icon name="plus" size={16} /></button>
-                  <button className="iconbtn" aria-label="종목 삭제" onClick={() => update({ items: r.items.filter((_, i) => i !== idx) })}><Icon name="trash" size={18} color="var(--text2)" /></button>
+                  <button className="iconbtn" aria-label={tr('세트 수 줄이기')} onClick={() => update({ items: r.items.map((x, i) => (i === idx ? { ...x, sets: Math.max(1, x.sets - 1) } : x)) })}><Icon name="minus" size={16} /></button>
+                  <span style={{ minWidth: 40, textAlign: 'center' }}>{tr('{0}세트', [it.sets])}</span>
+                  <button className="iconbtn" aria-label={tr('세트 수 늘리기')} onClick={() => update({ items: r.items.map((x, i) => (i === idx ? { ...x, sets: x.sets + 1 } : x)) })}><Icon name="plus" size={16} /></button>
+                  <button className="iconbtn" aria-label={tr('종목 삭제')} onClick={() => update({ items: r.items.filter((_, i) => i !== idx) })}><Icon name="trash" size={18} color="var(--text2)" /></button>
                 </div>
               </div>
             )
@@ -105,17 +107,19 @@ export function RoutineEdit({ id }: { id?: string }) {
               })
             }
           >
-            종목 추가
+            
+            {tr('종목 추가')}
           </button>
           {id && (
             <button className="btn danger mt12" onClick={() => { actions.deleteRoutine(id); draft = null; nav.pop() }}>
-              루틴 삭제
+              
+              {tr('루틴 삭제')}
             </button>
           )}
         </div>
       </Page>
       <div className="bottom-fixed" style={{ position: 'absolute', left: 0, right: 0, bottom: 'var(--footer-h)' }}>
-        <button className="btn" onClick={save}>저장</button>
+        <button className="btn" onClick={save}>{tr('저장')}</button>
       </div>
       {toast}
     </>

@@ -1,3 +1,4 @@
+import { tr } from '../lib/i18n'
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Icon } from './Icon'
 import { useNav } from '../nav'
@@ -18,7 +19,7 @@ export function TopBar({
     <div className="topbar">
       {back && (
         <div className="left">
-          <button className="iconbtn" aria-label="뒤로가기" onClick={onBack ?? nav.pop}>
+          <button className="iconbtn" aria-label={tr('뒤로가기')} onClick={onBack ?? nav.pop}>
             <Icon name="back" />
           </button>
         </div>
@@ -32,11 +33,14 @@ export function TopBar({
 export function Card({
   title,
   onMore,
+  action,
   children,
   className = '',
 }: {
   title?: string
   onMore?: () => void
+  // 제목 오른쪽 위에 놓는 버튼
+  action?: ReactNode
   children: ReactNode
   className?: string
 }) {
@@ -45,8 +49,9 @@ export function Card({
       {title && (
         <div className="card-head">
           <h3 className="card-title">{title}</h3>
+          {action}
           {onMore && (
-            <button className="round-arrow" onClick={onMore} aria-label={`${title} 상세`}>
+            <button className="round-arrow" onClick={onMore} aria-label={tr('{0} 상세', [title])}>
               <Icon name="chevron" size={16} />
             </button>
           )}

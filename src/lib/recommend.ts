@@ -1,8 +1,9 @@
 // 오늘의 추천 운동. 로그인한 상태면 서버의 AI(recommend-workout)에 물어보고,
 // 로그인이 없거나 호출이 실패하면 가장 오래 쉰 부위를 고르는 규칙 추천으로 대신한다.
+import { tr } from './i18n'
 import type { AppState, Exercise, PartCode } from '../types'
 import { BUILTIN, findExercise } from '../store'
-import { PART_NAME, PARTS } from './constants'
+import { PART_NAME_KO, PARTS } from './constants'
 import { recordedSessions } from './stats'
 
 export interface Recommendation {
@@ -59,13 +60,13 @@ export function recommendLocal(s: AppState, today = new Date()): Recommendation 
   // 기록이 없는 부위가 먼저, 그다음 가장 오래 쉰 부위. 같으면 PARTS 순서를 따른다
   const part = [...PARTS].sort((a, b) => daysSince(b) - daysSince(a))[0]
   const gap = daysSince(part)
-  const reason = gap === NEVER ? '아직 기록이 없는 부위예요' : gap === 0 ? '오늘 이미 한 부위예요' : `${gap}일 동안 쉬었어요`
+  const reason = gap === NEVER ? tr('아직 기록이 없는 부위예요') : gap === 0 ? tr('오늘 이미 한 부위예요') : tr('{0}일 동안 쉬었어요', [gap])
   return { part, reason, exercises: rankedFor(s, part, freq).slice(0, PICK_COUNT), source: 'local' }
 }
 
 // ----- AI 추천 -----
 
-const KO_TO_PART = Object.fromEntries(PARTS.map((p) => [PART_NAME[p], p])) as Record<string, PartCode>
+const KO_TO_PART = Object.fromEntries(PARTS.map((p) => [PART_NAME_KO[p], p])) as Record<string, PartCode>
 
 export interface AiConfig {
   url: string
@@ -78,14 +79,14 @@ export function buildAiRequest(s: AppState, today = new Date()) {
   const { daysSince, sets14d, freq } = history(s, today)
   return {
     parts: PARTS.map((p) => ({
-      bodyPart: PART_NAME[p],
+      bodyPart: PART_NAME_KO[p],
       daysSince: daysSince(p) === NEVER ? null : daysSince(p),
       sets14d: sets14d[p] ?? 0,
     })),
     candidates: PARTS.flatMap((p) =>
       rankedFor(s, p, freq)
         .slice(0, CANDIDATES_PER_PART)
-        .map((e) => ({ id: e.id, name: e.nameKo, bodyPart: PART_NAME[p] })),
+        .map((e) => ({ id: e.id, name: e.nameKo, bodyPart: PART_NAME_KO[p] })),
     ),
   }
 }

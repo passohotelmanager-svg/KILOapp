@@ -1,4 +1,5 @@
 // 탭별 화면 스택 내비게이션. 탭마다 마지막 화면과 스크롤 위치를 기억한다 (PRD 7.4).
+import { tr } from './lib/i18n'
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
 
 export type Tab = 'today' | 'community' | 'analysis' | 'profile'
@@ -76,6 +77,6 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
 export function useNav(): Nav {
   const n = useContext(NavCtx)
-  if (!n) throw new Error('NavProvider 밖에서 사용할 수 없습니다')
+  if (!n) throw new Error(tr('NavProvider 밖에서 사용할 수 없습니다'))
   return n
 }
