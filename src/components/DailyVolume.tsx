@@ -9,6 +9,7 @@ import { dayLabel, parseYmd, ymd } from '../lib/dates'
 import { developerSummary, fetchDeveloperVolume, type DeveloperVolume } from '../lib/developerVolume'
 import { comma, hm, vol } from '../lib/format'
 import { tr } from '../lib/i18n'
+import { authEnabled } from '../lib/auth'
 
 // 비교 표의 한 줄: 개발자 값과 내 값, 차이
 function Row({ label, dev, me, fmt, unit = '' }: { label: string; dev: number; me: number; fmt: (n: number) => string; unit?: string }) {
@@ -75,7 +76,7 @@ export function DailyVolume() {
       <p className="muted" style={{ marginBottom: 8 }}>{tr('개발자의 기록과 내 기록을 비교해 보세요')}</p>
       <img src="/bodybuilder.png" alt={tr('보디빌딩 포즈')} style={{ display: 'block', width: 150, height: 150, margin: '0 auto 12px', objectFit: 'contain' }} />
       {dev && url && <img src={url} alt={tr('개발자 운동 요약 · {0}', [dev.date])} style={{ display: 'block', width: '100%', borderRadius: 12 }} />}
-      {loaded && !dev && <p className="muted center">{tr('개발자 기록을 불러오지 못했어요')}</p>}
+      {loaded && !dev && <p className="muted center">{authEnabled ? tr('개발자 기록이 아직 없어요') : tr('개발자 기록을 불러오지 못했어요')}</p>}
       {dev && (
         <table className="tbl mt12">
           <thead>

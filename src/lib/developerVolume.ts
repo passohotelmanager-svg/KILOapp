@@ -1,6 +1,9 @@
 // 개발자(운영자)의 하루 볼륨. 모든 사용자가 같은 값을 보고 자기 기록과 비교한다.
-// 지금은 public/developer-volume.json 파일을 쓰고 읽는다. 서버를 붙이면 fetchDeveloperVolume, publishDeveloperVolume 안만 바꾸면 된다.
+// 서버 로그인(Supabase)이 켜져 있으면 서버의 developer_volume 표를 쓰고, 데모 모드에서는 public/developer-volume.json 파일을 쓴다.
+import { useSyncExternalStore } from 'react'
 import { getLang, tr } from './i18n'
+import { authEnabled } from './auth'
+import { checkIsDeveloper, fetchDeveloperVolumeRow, publishDeveloperVolumeRow } from './cloud'
 import { comma } from './format'
 import { buildSummary, type PeriodSummary } from './summary'
 import { parseYmd } from './dates'
@@ -27,19 +30,28 @@ export interface DeveloperVolume {
   }[]
 }
 
+const isVolume = (d: unknown): d is DeveloperVolume =>
+  typeof d === 'object' && d !== null && typeof (d as DeveloperVolume).volume === 'number' && Array.isArray((d as DeveloperVolume).items)
+
+// 개발자의 볼륨을 읽는다. 없으면 null
 export async function fetchDeveloperVolume(): Promise<DeveloperVolume | null> {
+  if (authEnabled) {
+    const r = await fetchDeveloperVolumeRow()
+    return r.ok && isVolume(r.value) ? r.value : null
+  }
   try {
     const res = await fetch('/developer-volume.json', { cache: 'no-store' })
     if (!res.ok) return null
-    const d = (await res.json()) as DeveloperVolume
-    return typeof d?.volume === 'number' && Array.isArray(d.items) ? d : null
+    const d: unknown = await res.json()
+    return isVolume(d) ? d : null
   } catch {
     return null
   }
 }
 
-// 개발자 볼륨을 올린다. 지금은 개발용 서버(vite.config.ts의 /api/developer-volume)가 파일로 저장한다.
+// 개발자의 볼륨을 올린다. 서버 모드에서는 개발자 계정만 성공하고, 데모 모드에서는 개발 서버(/api/developer-volume)가 파일로 저장한다.
 export async function publishDeveloperVolume(d: DeveloperVolume): Promise<boolean> {
+  if (authEnabled) return (await publishDeveloperVolumeRow(d)).ok
   try {
     const res = await fetch('/api/developer-volume', {
       method: 'POST',
@@ -49,6 +61,31 @@ export async function publishDeveloperVolume(d: DeveloperVolume): Promise<boolea
     return res.ok
   } catch {
     return false
+  }
+}
+
+// ----- 내가 개발자 계정인지 (서버 모드) -----
+let developer = false
+const devListeners = new Set<() => void>()
+export function useIsDeveloper(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      devListeners.add(cb)
+      return () => devListeners.delete(cb)
+    },
+    () => developer,
+  )
+}
+// 로그인할 때 한 번 확인한다. 로그아웃(loggedIn=false)하면 개발자 상태를 지운다
+export async function refreshDeveloper(loggedIn: boolean): Promise<void> {
+  let next = false
+  if (loggedIn && authEnabled) {
+    const r = await checkIsDeveloper()
+    next = r.ok && r.value
+  }
+  if (next !== developer) {
+    developer = next
+    devListeners.forEach((l) => l())
   }
 }
 

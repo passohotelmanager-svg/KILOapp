@@ -113,3 +113,25 @@ export function subscribeComments(onChange: () => void): () => void {
     void client.removeChannel(channel)
   }
 }
+
+// ----- 개발자의 볼륨 (개발자 계정만 올릴 수 있고, 로그인한 사용자는 모두 읽는다) -----
+
+// 내가 개발자 계정인지. 개발자 계정은 소유자가 SQL로 지정한다
+export async function checkIsDeveloper(): Promise<CloudResult<boolean>> {
+  if (!supabase) return off()
+  const { data, error } = await supabase.rpc('is_developer')
+  return error ? { ok: false, reason: failOf(error) } : { ok: true, value: data === true }
+}
+
+// 서버에 저장된 개발자의 볼륨 (값의 모양은 developerVolume.ts가 확인한다)
+export async function fetchDeveloperVolumeRow(): Promise<CloudResult<unknown | null>> {
+  if (!supabase) return off()
+  const { data, error } = await supabase.from('developer_volume').select('data').maybeSingle()
+  return error ? { ok: false, reason: failOf(error) } : { ok: true, value: data?.data ?? null }
+}
+
+export async function publishDeveloperVolumeRow(payload: unknown): Promise<CloudResult<true>> {
+  if (!supabase) return off()
+  const { error } = await supabase.rpc('publish_developer_volume', { p_data: payload })
+  return error ? { ok: false, reason: failOf(error) } : { ok: true, value: true }
+}

@@ -6,7 +6,7 @@ import { Icon } from './components/Icon'
 import { RestEngine, openRestScreen, useRestLeft } from './components/RestEngine'
 import { mmss } from './lib/format'
 import { ymd } from './lib/dates'
-import { publishDeveloperVolume, toDeveloperVolume } from './lib/developerVolume'
+import { publishDeveloperVolume, refreshDeveloper, toDeveloperVolume, useIsDeveloper } from './lib/developerVolume'
 import { authEnabled, startAuthSync } from './lib/auth'
 import { startSync, useSyncStatus } from './lib/sync'
 import { startCommunitySync } from './lib/communitySync'
@@ -93,8 +93,11 @@ function useReminder() {
 let lastPublished = ''
 function useDeveloperPublish() {
   const s = useAppState()
+  const isDeveloper = useIsDeveloper()
+  // 서버 로그인에서는 개발자 계정일 때만, 데모 모드에서는 설정의 개발자 모드가 켜져 있을 때만 올린다
+  const enabled = authEnabled ? isDeveloper : s.settings.developerMode
   useEffect(() => {
-    if (!s.settings.developerMode) return
+    if (!enabled) return
     const timer = window.setTimeout(() => {
       const weightKg = [...s.bodyLog].reverse().find((l) => l.weightKg)?.weightKg ?? s.profile?.weightKg ?? 0
       const d = toDeveloperVolume(s, weightKg)
@@ -106,7 +109,7 @@ function useDeveloperPublish() {
       })
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [s.sessions, s.bodyLog, s.profile, s.settings.developerMode]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [s.sessions, s.bodyLog, s.profile, enabled]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 function Main() {
@@ -136,6 +139,10 @@ export function App() {
   const [authReady, setAuthReady] = useState(false)
   useEffect(() => startAuthSync((u) => actions.applyAuthUser(u), () => setAuthReady(true)), [])
   useEffect(() => startSync(), [])
+  const accountId = s.user && !s.user.id.startsWith('me-') ? s.user.id : null
+  useEffect(() => {
+    void refreshDeveloper(accountId !== null)
+  }, [accountId])
   useEffect(() => startCommunitySync(), [])
   const sync = useSyncStatus()
   // 로그인 직후 서버의 내 데이터를 불러오는 동안에는 화면을 비워 둔다 (처음 화면이 잠깐 보이지 않게)

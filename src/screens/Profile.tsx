@@ -14,6 +14,7 @@ import { requestNotifPermission } from '../lib/alarm'
 import { authEnabled, changePassword } from '../lib/auth'
 import { claimNickname, deleteMyAccount } from '../lib/cloud'
 import { logoutAndClear, useSyncStatus } from '../lib/sync'
+import { useIsDeveloper } from '../lib/developerVolume'
 import { NAME_LANG_OPTIONS } from './Picker'
 import type { Provider } from '../types'
 
@@ -263,6 +264,7 @@ export function Settings() {
   const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // 월요일부터 표시 (값은 Date.getDay 기준)
 
   const realUser = authEnabled && !!s.user && !s.user.id.startsWith('me-')
+  const isDeveloper = useIsDeveloper()
   const sync = useSyncStatus()
   const [delEmail, setDelEmail] = useState('')
   const [delBusy, setDelBusy] = useState(false)
@@ -336,10 +338,18 @@ export function Settings() {
           />
         </Card>
 
-        <Card title={tr('개발자 모드')}>
-          <Toggle on={st.developerMode} onChange={(v) => actions.updateSettings({ developerMode: v })} label={tr('개발자 모드')} />
-          <p className="muted mt8" style={{ fontSize: 12 }}>{tr('켜면 내 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨이 갱신돼요')}</p>
-        </Card>
+        {/* 데모 모드에서는 스위치로, 서버 로그인에서는 개발자 계정일 때만 안내를 보여준다 */}
+        {!authEnabled && (
+          <Card title={tr('개발자 모드')}>
+            <Toggle on={st.developerMode} onChange={(v) => actions.updateSettings({ developerMode: v })} label={tr('개발자 모드')} />
+            <p className="muted mt8" style={{ fontSize: 12 }}>{tr('켜면 내 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨이 갱신돼요')}</p>
+          </Card>
+        )}
+        {authEnabled && isDeveloper && (
+          <Card title={tr('개발자 계정')}>
+            <p className="muted">{tr('이 계정의 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨에 자동으로 반영돼요')}</p>
+          </Card>
+        )}
 
         <Card title={tr('닉네임')}>
           <div className="row gap8">

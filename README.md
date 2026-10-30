@@ -133,11 +133,22 @@ supabase functions deploy recommend-workout
 
 ## 개발자의 볼륨
 
-투데이 화면 아래에 개발자의 하루 볼륨과 내 기록의 비교가 나옵니다.
+투데이 화면 아래에 개발자의 하루 볼륨과 내 기록의 비교가 나옵니다. 개발자 계정으로 운동을 기록하면 모든 사용자의 화면에 자동으로 반영됩니다.
 
-- 설정에서 **개발자 모드**를 켜면 내 운동 기록이 바뀔 때마다 개발자 볼륨이 갱신됩니다.
-- 지금은 개발 서버(`npm run dev`)가 `public/developer-volume.json`에 저장하는 임시 방식입니다. 같은 컴퓨터(localhost)에서 온 요청만 받습니다.
-- 배포할 때는 서버 DB로 바꾸고, 개발자 여부를 스위치가 아니라 계정으로 가려야 합니다. 읽기/쓰기 코드는 `src/lib/developerVolume.ts`에 모여 있습니다.
+서버 로그인(Supabase)을 쓸 때:
+1. `supabase/migrations/20261031000200_developer_volume.sql` 을 SQL Editor 에서 실행합니다 (앞의 두 SQL 다음에).
+2. 개발자 본인 이메일로 앱에 가입합니다.
+3. SQL Editor 에서 아래를 이메일만 바꿔서 한 번 실행해 그 계정을 개발자 계정으로 지정합니다.
+   ```sql
+   insert into public.developer_accounts (user_id)
+   select id from auth.users where email = '내_이메일@example.com';
+   ```
+4. 그 계정으로 운동을 기록하면 기록이 바뀔 때마다 `developer_volume` 표에 자동 저장됩니다. 다른 사용자는 읽기만 가능하고, 개발자 계정이 아니면 서버가 저장을 거절합니다.
+
+개발자 계정은 이메일이 아니라 **가입한 뒤 소유자가 SQL로 직접 지정**합니다(확인 메일을 끈 상태에서 남이 같은 이메일로 먼저 가입해 개발자 행세를 하지 못하게 하기 위해서입니다).
+해제: `delete from public.developer_accounts where user_id = (select id from auth.users where email = '...');`
+
+데모 모드(`.env.local` 없음)에서는 설정의 **개발자 모드** 스위치를 켜면 개발 서버(`npm run dev`)가 `public/developer-volume.json` 에 저장합니다(같은 컴퓨터에서 온 요청만 받음). 읽기/쓰기 코드는 `src/lib/developerVolume.ts` 에 모여 있습니다.
 
 ## 번역
 

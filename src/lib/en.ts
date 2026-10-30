@@ -1,5 +1,8 @@
 // 영어 번역표. 키는 한국어 원문이고, 값이 없는 문구는 한국어 그대로 보인다.
 export const EN: Record<string, string> = {
+  "개발자 기록이 아직 없어요": "No developer record yet",
+  "이 계정의 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨에 자동으로 반영돼요": "Whenever this account's workout record changes, it updates the Developer's volume on Today automatically",
+  "개발자 계정": "Developer account",
   "{0} 대화예요 · 매달 1일에 새로 시작해요": "{0} chat · Starts fresh on the 1st of each month",
   "보내지 못했어요. 잠시 후 다시 시도해주세요": "Couldn't send. Please try again shortly",
   "너무 빨리 보내고 있어요. 잠시 후 다시 시도해주세요": "You're sending too fast. Please try again shortly",
