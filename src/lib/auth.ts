@@ -6,6 +6,9 @@ export type AuthProvider = 'google' | 'apple'
 
 export const authEnabled = supabase !== null
 
+// Google 로그인 사용 여부. Google Cloud와 Supabase의 Google 설정을 마친 뒤 true로 바꾼다
+export const googleLoginEnabled = false
+
 // 앱이 쓰는 로그인 사용자 정보
 export interface AuthUser {
   id: string

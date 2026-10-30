@@ -41,6 +41,7 @@ export const EN: Record<string, string> = {
   "로그인": "in",
   "가입": "up",
   "Google 계정 또는 이메일로 {0}해요": "Sign {0} with your Google account or email",
+  "이메일로 {0}해요": "Sign {0} with your email",
   "반가워요": "back",
   "다시 만나서": "Welcome",
   "로그인한 계정이 연결돼 있어요. 로그인 수단을 늘리는 기능은 곧 추가돼요.": "Your signed-in account is linked. Adding more sign-in methods is coming soon.",

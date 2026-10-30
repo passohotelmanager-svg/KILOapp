@@ -8,7 +8,7 @@ import { WEEKLY_HINT } from '../lib/constants'
 import { activityFromWeekly } from '../lib/calc'
 import { requestNotifPermission } from '../lib/alarm'
 import { claimNickname, nicknameAvailable } from '../lib/cloud'
-import { authEnabled, sendPasswordReset, signInWithEmail, signInWithProvider, signUpWithEmail, type AuthFail, type AuthProvider } from '../lib/auth'
+import { authEnabled, googleLoginEnabled, sendPasswordReset, signInWithEmail, signInWithProvider, signUpWithEmail, type AuthFail, type AuthProvider } from '../lib/auth'
 import type { Goal, Profile, Provider, Sex } from '../types'
 
 const range = (a: number, b: number, fmt: (n: number) => string = String) =>
@@ -336,7 +336,9 @@ export function Onboarding() {
 
   if (step === 9 || step === 11) {
     const signup = step === 9
-    const googleBtn = (
+    // 데모 로그인일 때는 이 버튼이 유일한 시작 버튼이라 항상 보여준다
+    const showGoogle = !authEnabled || googleLoginEnabled
+    const googleBtn = showGoogle && (
       <button className="btn line" style={{ marginBottom: 10 }} onClick={() => login('google')}>
         {tr('Google로 계속하기')}
       </button>
@@ -344,12 +346,12 @@ export function Onboarding() {
     return shell(
       <>
         <h1 className="h1">{signup ? <>{tr('로그인하고')}<br />{tr('기록을 시작해요')}</> : <>{tr('다시 만나서')}<br />{tr('반가워요')}</>}</h1>
-        <p className="sub">{authEnabled ? tr('Google 계정 또는 이메일로 {0}해요', [signup ? tr('가입') : tr('로그인')]) : tr('이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요')}</p>
+        <p className="sub">{authEnabled ? tr(googleLoginEnabled ? 'Google 계정 또는 이메일로 {0}해요' : '이메일로 {0}해요', [signup ? tr('가입') : tr('로그인')]) : tr('이 버전은 데모 로그인이라 계정 정보가 이 기기에만 저장돼요')}</p>
         <div className="mt24">
           {googleBtn}
           {authEnabled && (
             <>
-              <p className="sub center" style={{ margin: '14px 0' }}>{tr('또는')}</p>
+              {showGoogle && <p className="sub center" style={{ margin: '14px 0' }}>{tr('또는')}</p>}
               <input className="input" type="email" autoComplete="email" inputMode="email" placeholder={tr('이메일')} value={email} onChange={(e) => setEmail(e.target.value)} aria-label={tr('이메일')} />
               <input className="input mt8" type="password" autoComplete={signup ? 'new-password' : 'current-password'} placeholder={signup ? tr('비밀번호 (8자 이상)') : tr('비밀번호')} value={pw} onChange={(e) => setPw(e.target.value)} aria-label={tr('비밀번호')} />
               {msg && <p className="sub" style={{ color: 'var(--dec)', marginTop: 10 }} role="status">{msg}</p>}
