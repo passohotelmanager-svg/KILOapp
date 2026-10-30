@@ -18,6 +18,7 @@ import type {
 import { uid } from './lib/format'
 import { ymd } from './lib/dates'
 import { BANNED_WORDS } from './lib/constants'
+import { activityFromWeekly } from './lib/calc'
 
 const KEY = 'kilo.state.v1'
 
@@ -242,7 +243,10 @@ export const actions = {
     patch({ profile, onboarded: true, bodyLog: [log] })
   },
   updateProfile(p: Partial<Profile>) {
-    if (state.profile) patch({ profile: { ...state.profile, ...p } })
+    if (!state.profile) return
+    // 주간 운동 횟수를 바꾸면 활동 계수도 그에 맞춰 바뀐다 (활동 계수를 함께 지정하면 그 값을 쓴다)
+    const next = p.weeklyGoal !== undefined && p.activity === undefined ? { ...p, activity: activityFromWeekly(p.weeklyGoal) } : p
+    patch({ profile: { ...state.profile, ...next } })
   },
   updateSettings(p: Partial<Settings>) {
     patch({ settings: { ...state.settings, ...p } })

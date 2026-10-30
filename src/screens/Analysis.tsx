@@ -30,11 +30,12 @@ export function Analysis() {
   const [toast, show] = useToast()
 
   // ---- 사진 기준 기본 구역 (고정 기간) ----
-  const from7 = addDays(today, -6)
-  const secDays = secondsByDay(s, from7, today)
+  const from7 = startOfWeek(today) // 한 주는 월요일부터 일요일까지
+  const to7 = addDays(from7, 6)
+  const secDays = secondsByDay(s, from7, to7)
   const totalSec = Object.values(secDays).reduce((a, b) => a + b, 0)
   const days7 = Array.from({ length: 7 }, (_, i) => addDays(from7, i))
-  const a7 = agg(s, from7, today)
+  const a7 = agg(s, from7, to7)
   const vol7: Record<string, number> = {}
   PARTS.forEach((p) => (vol7[p] = a7.byPart[p].volume))
   const [open7, setOpen7] = useState<PartCode | null>(null)
@@ -49,7 +50,7 @@ export function Analysis() {
   const eatenDays = intake.filter((v) => v > 0)
   const avgIntake = eatenDays.length ? eatenDays.reduce((a, b) => a + b, 0) / eatenDays.length : 0
   const burn = s.profile ? Math.round(tdee(s.profile)) : 0
-  const mac = macrosOn(s, from7, today)
+  const mac = macrosOn(s, from7, to7)
   const macAvgK = mac.days ? mac.kcal / mac.days : 0
   const cK = mac.carb * 4
   const pK = mac.protein * 4
@@ -83,7 +84,7 @@ export function Analysis() {
         {/* 2 운동 현황 */}
         <Card title="운동 현황" onMore={() => nav.push('detail', { kind: 'workout' })}>
           <div className="num">{totalSec ? hm(totalSec) : '-'}</div>
-          <p className="muted">최근 7일 합계</p>
+          <p className="muted">이번 주 합계</p>
           <div className="hr" />
           <div className="circle-days">
             {days7.map((d) => {
@@ -100,7 +101,7 @@ export function Analysis() {
 
         {/* 3 근육 피로도 */}
         <Card title="근육 피로도">
-          <p className="muted" style={{ marginBottom: 10 }}>{mdLabel(from7)} ~ {mdLabel(today)}</p>
+          <p className="muted" style={{ marginBottom: 10 }}>{mdLabel(from7)} ~ {mdLabel(to7)}</p>
           <div className="graybox">
             <BodyMap volumes={vol7} />
           </div>
@@ -122,7 +123,7 @@ export function Analysis() {
               })}
             </tbody>
           </table>
-          {PARTS.every((p) => a7.byPart[p].sets === 0) && <p className="muted center mt8">최근 7일 기록 없음</p>}
+          {PARTS.every((p) => a7.byPart[p].sets === 0) && <p className="muted center mt8">이번 주 기록 없음</p>}
         </Card>
 
         {/* 5 월간 운동 현황 */}
@@ -150,7 +151,7 @@ export function Analysis() {
         {/* 8 칼로리 변화 */}
         <Card title="칼로리 변화" onMore={() => nav.push('detail', { kind: 'calories' })}>
           <Segmented value={calTab} onChange={setCalTab} options={[{ value: 'in', label: '섭취' }, { value: 'out', label: '소비' }]} />
-          <p className="muted mt12">{mdLabel(from7)} ~ {mdLabel(today)}</p>
+          <p className="muted mt12">{mdLabel(from7)} ~ {mdLabel(to7)}</p>
           {calTab === 'in' ? (
             <p className="sentence" style={{ fontSize: 18, fontWeight: 700 }}>
               {avgIntake ? <>하루 평균 <b>{comma(avgIntake)}</b>kcal 먹었어요</> : '아직 식단 기록이 없어요'}
@@ -173,7 +174,7 @@ export function Analysis() {
 
         {/* 9 영양소 */}
         <Card title="영양소" onMore={() => nav.push('detail', { kind: 'nutrients' })}>
-          <p className="muted">7일 평균 | {mdLabel(from7)} ~ {mdLabel(today)}</p>
+          <p className="muted">이번 주 평균 | {mdLabel(from7)} ~ {mdLabel(to7)}</p>
           <div className="num">{macAvgK ? comma(macAvgK) : '-'}{macAvgK ? <small>kcal</small> : null}</div>
           <div className="center mt12"><Donut slices={[{ value: cK, color: '#FFC978' }, { value: pK, color: '#F27052' }, { value: fK, color: '#6FD6A0' }]} /></div>
           <div className="three mt12">

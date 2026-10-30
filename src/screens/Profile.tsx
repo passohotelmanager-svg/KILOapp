@@ -5,7 +5,7 @@ import { useNav } from '../nav'
 import { Card, Page, Segmented, Sheet, Toggle, TopBar, useToast } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { ACTIVITY_LEVELS } from '../lib/constants'
-import { best1RM, sessionSeconds } from '../lib/calc'
+import { best1RM, dailyTarget, sessionSeconds } from '../lib/calc'
 import { vol, comma, hm } from '../lib/format'
 import { mdLabel, parseYmd } from '../lib/dates'
 import { agg, recordedSessions } from '../lib/stats'
@@ -256,6 +256,7 @@ export function Settings() {
   const [confirmDel, setConfirmDel] = useState(false)
   const st = s.settings
   const DAYS = ['일', '월', '화', '수', '목', '금', '토']
+  const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // 월요일부터 표시 (값은 Date.getDay 기준)
 
   const saveNick = () => {
     const t = nick.trim()
@@ -323,13 +324,13 @@ export function Settings() {
           {st.remindOn && (
             <>
               <div className="chips" style={{ padding: '12px 0 0' }}>
-                {DAYS.map((d, i) => (
+                {DAY_ORDER.map((i) => (
                   <button
-                    key={d}
+                    key={i}
                     className={`chip ${st.remindDays.includes(i) ? 'on' : ''}`}
                     onClick={() => actions.updateSettings({ remindDays: st.remindDays.includes(i) ? st.remindDays.filter((x) => x !== i) : [...st.remindDays, i] })}
                   >
-                    {d}
+                    {DAYS[i]}
                   </button>
                 ))}
               </div>
@@ -338,6 +339,19 @@ export function Settings() {
             </>
           )}
         </Card>
+
+        {s.profile && (
+          <Card title="주간 운동 횟수">
+            <div className="chips" style={{ padding: '4px 0 0' }}>
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                <button key={n} className={`chip ${s.profile!.weeklyGoal === n ? 'on' : ''}`} onClick={() => actions.updateProfile({ weeklyGoal: n })}>
+                  {n}회
+                </button>
+              ))}
+            </div>
+            <p className="muted mt8">하루 섭취 가능량 {comma(dailyTarget(s.profile))}kcal (활동 계수 {s.profile.activity})</p>
+          </Card>
+        )}
 
         {s.profile && (
           <Card title="활동 계수">
