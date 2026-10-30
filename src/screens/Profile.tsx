@@ -265,6 +265,8 @@ export function Settings() {
 
   const realUser = authEnabled && !!s.user && !s.user.id.startsWith('me-')
   const isDeveloper = useIsDeveloper()
+  // 활동 계수가 5단계 표의 값과 정확히 같지 않아도(주간 운동 횟수로 정해진 값) 가장 가까운 단계를 강조한다
+  const nearestFactor = s.profile ? ACTIVITY_LEVELS.reduce((best, a) => (Math.abs(a.factor - s.profile!.activity) < Math.abs(best - s.profile!.activity) ? a.factor : best), ACTIVITY_LEVELS[0].factor) : 0
   const sync = useSyncStatus()
   const [delEmail, setDelEmail] = useState('')
   const [delBusy, setDelBusy] = useState(false)
@@ -427,7 +429,7 @@ export function Settings() {
         {s.profile && (
           <Card title={tr('활동 계수')}>
             {ACTIVITY_LEVELS.map((a) => (
-              <button key={a.factor} className={`pick ${s.profile!.activity === a.factor ? 'on' : ''}`} style={{ padding: 12, marginBottom: 8 }} onClick={() => actions.updateProfile({ activity: a.factor })}>
+              <button key={a.factor} className={`pick ${nearestFactor === a.factor ? 'on' : ''}`} style={{ padding: 12, marginBottom: 8 }} onClick={() => actions.updateProfile({ activity: a.factor })}>
                 <b style={{ fontSize: 15 }}>{a.name} ({a.factor})</b>
                 <span>{a.desc}</span>
               </button>

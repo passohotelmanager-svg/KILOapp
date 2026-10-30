@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { vol } from './format'
-import { aggregate, bmr, buildAssist, cardioBurn, dailyTarget, est1RM, macroKcal, setVolume, tdee } from './calc'
+import { activityFromWeekly, aggregate, bmr, buildAssist, cardioBurn, dailyTarget, est1RM, macroKcal, setVolume, tdee } from './calc'
 import { startOfWeek, ymd, timeAgo } from './dates'
 import type { Exercise, Profile, Session } from '../types'
 
@@ -103,5 +103,26 @@ describe('유산소 소모 칼로리', () => {
   })
   it('기간 밖 기록은 제외', () => {
     expect(cardioBurn([ss('2026-10-20', 'cardio-04', 30)], '2026-10-26', '2026-11-01', lookup, 70).total).toBe(0)
+  })
+})
+
+describe('주간 운동 횟수와 활동 계수', () => {
+  it('횟수가 늘수록 활동 계수가 커진다 (1~7회 모두 다른 값)', () => {
+    const f = [1, 2, 3, 4, 5, 6, 7].map(activityFromWeekly)
+    for (let i = 1; i < f.length; i++) expect(f[i]).toBeGreaterThan(f[i - 1])
+    expect(new Set(f).size).toBe(7)
+  })
+  it('NASM 구간 안에 머문다', () => {
+    expect(activityFromWeekly(0)).toBe(1.2)
+    expect(activityFromWeekly(2)).toBe(1.375)
+    expect(activityFromWeekly(5)).toBe(1.55)
+    expect(activityFromWeekly(7)).toBe(1.725)
+    expect(activityFromWeekly(99)).toBe(1.725)
+  })
+  it('횟수를 바꾸면 하루 섭취 가능량이 매번 달라진다', () => {
+    const base: Profile = { goal: 'health', weeklyGoal: 3, birth: '1996-10-29', sex: 'male', heightCm: 175, weightKg: 70, activity: 1.55 }
+    const today = new Date('2026-10-30')
+    const kcal = [1, 2, 3, 4, 5, 6, 7].map((n) => dailyTarget({ ...base, weeklyGoal: n, activity: activityFromWeekly(n) }, 'health', today))
+    expect(new Set(kcal).size).toBe(7)
   })
 })

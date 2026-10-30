@@ -260,12 +260,12 @@ export function tdee(p: Profile, today = new Date()): number {
   return bmr(p, today) * p.activity
 }
 
-// 주간 운동 횟수 -> 활동 계수 기본값 (7.3)
+// 주간 운동 횟수 -> 활동 계수. 횟수가 늘어날 때마다 값이 조금씩 커지도록 한다.
+// NASM 구간(주 1~3일 1.375, 주 3~5일 1.55, 주 6~7일 1.725)의 안쪽에서 횟수별로 나눈 값이다.
+const ACTIVITY_BY_WEEKLY = [1.2, 1.3, 1.375, 1.45, 1.5, 1.55, 1.64, 1.725]
 export function activityFromWeekly(n: number): number {
-  if (n <= 0) return 1.2
-  if (n <= 2) return 1.375
-  if (n <= 5) return 1.55
-  return 1.725
+  const i = Math.min(7, Math.max(0, Math.round(n)))
+  return ACTIVITY_BY_WEEKLY[i]
 }
 
 // 목표별 하루 열량. 근력 증가는 오픈 이슈 7이라 유지 열량으로 둔다.
