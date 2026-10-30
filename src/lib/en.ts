@@ -1,5 +1,15 @@
 // 영어 번역표. 키는 한국어 원문이고, 값이 없는 문구는 한국어 그대로 보인다.
 export const EN: Record<string, string> = {
+  "차이": "Diff",
+  "나": "Me",
+  "개발자": "Developer",
+  "항목": "Item",
+  "개발자 기록을 불러오지 못했어요": "Couldn't load the developer's record",
+  "개발자의 기록과 내 기록을 비교해 보세요": "Compare your record with the developer's",
+  "개발자 운동 요약 · {0}": "Developer workout summary · {0}",
+  "개발자의 볼륨": "Developer's volume",
+  "개발자 모드": "Developer mode",
+  "켜면 내 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨이 갱신돼요": "When on, the Developer's volume on Today updates whenever your workout record changes",
   "투데이": "Today",
   "커뮤니티": "Community",
   "분석": "Analysis",

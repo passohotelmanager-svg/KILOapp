@@ -6,6 +6,7 @@ import { useNav } from '../nav'
 import { Card, Page, Sheet, TopBar } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { Pose } from '../components/Pose'
+import { DailyVolume } from '../components/DailyVolume'
 import { MEALS, PART_NAME } from '../lib/constants'
 import { WEEK_HEADERS, addDays, addMonths, dayName, endOfMonth, mdLabel, monthLabel, parseYmd, startOfMonth, startOfWeek, ymd } from '../lib/dates'
 import { vol, comma, hm } from '../lib/format'
@@ -189,6 +190,10 @@ export function Today() {
             <h3 className="card-title mt8">{tr('라이브러리')}</h3>
             <p className="sub">{tr('나만의 운동 라이브러리를 만드세요')}</p>
           </button>
+        </div>
+
+        <div style={{ padding: '0 16px' }}>
+          <DailyVolume />
         </div>
       </Page>
       {calOpen && <MonthSheet s={s} todayKey={todayKey} onClose={() => setCalOpen(false)} />}

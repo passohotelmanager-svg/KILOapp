@@ -108,6 +108,7 @@ export interface Profile {
 export interface Settings {
   nameLang: NameLang
   lang: Lang // 화면 언어
+  developerMode: boolean // 내 운동 기록을 개발자 볼륨으로 올린다
   restDefault: number
   remindOn: boolean
   remindDays: number[] // 0=일 ~ 6=토

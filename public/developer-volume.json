@@ -1,0 +1,13 @@
+{
+  "name": "KILO",
+  "date": "2026-10-30",
+  "seconds": 4500,
+  "exerciseCount": 3,
+  "volume": 9835,
+  "kcal": 531,
+  "items": [
+    { "name": "바벨 백스쿼트", "nameEn": "Barbell Back Squat", "sets": 6, "repsLo": 10, "repsHi": 10 },
+    { "name": "프론트 스쿼트", "nameEn": "Front Squat", "sets": 5, "repsLo": 5, "repsHi": 5 },
+    { "name": "인클라인 벤치프레스", "nameEn": "Incline Bench Press", "sets": 4, "repsLo": 6, "repsHi": 6 }
+  ]
+}

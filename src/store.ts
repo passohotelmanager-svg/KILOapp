@@ -28,6 +28,7 @@ export const BUILTIN: Exercise[] = seed as Exercise[]
 const defaultSettings: Settings = {
   nameLang: 'ko',
   lang: 'ko',
+  developerMode: false,
   restDefault: 30,
   remindOn: false,
   remindDays: [1, 3, 5],

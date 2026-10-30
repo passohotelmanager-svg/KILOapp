@@ -6,6 +6,7 @@ import { Icon } from './components/Icon'
 import { RestEngine, openRestScreen, useRestLeft } from './components/RestEngine'
 import { mmss } from './lib/format'
 import { ymd } from './lib/dates'
+import { publishDeveloperVolume, toDeveloperVolume } from './lib/developerVolume'
 import { showNotification } from './lib/alarm'
 import { Onboarding } from './screens/Onboarding'
 import { Today } from './screens/Today'
@@ -85,9 +86,30 @@ function useReminder() {
   }, [s.settings, s.lastReminderDate])
 }
 
+// 개발자 모드일 때 운동 기록이 바뀌면 잠시 뒤 개발자 볼륨을 갱신한다 (같은 값이면 다시 올리지 않는다)
+let lastPublished = ''
+function useDeveloperPublish() {
+  const s = useAppState()
+  useEffect(() => {
+    if (!s.settings.developerMode) return
+    const timer = window.setTimeout(() => {
+      const weightKg = [...s.bodyLog].reverse().find((l) => l.weightKg)?.weightKg ?? s.profile?.weightKg ?? 0
+      const d = toDeveloperVolume(s, weightKg)
+      if (!d) return
+      const body = JSON.stringify(d)
+      if (body === lastPublished) return
+      publishDeveloperVolume(d).then((ok) => {
+        if (ok) lastPublished = body
+      })
+    }, 1000)
+    return () => window.clearTimeout(timer)
+  }, [s.sessions, s.bodyLog, s.profile, s.settings.developerMode]) // eslint-disable-line react-hooks/exhaustive-deps
+}
+
 function Main() {
   const nav = useNav()
   useReminder()
+  useDeveloperPublish()
   return (
     <div className="shell">
       <Screen key={nav.scrollKey} />

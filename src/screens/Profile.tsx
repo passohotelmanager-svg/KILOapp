@@ -289,6 +289,11 @@ export function Settings() {
           />
         </Card>
 
+        <Card title={tr('개발자 모드')}>
+          <Toggle on={st.developerMode} onChange={(v) => actions.updateSettings({ developerMode: v })} label={tr('개발자 모드')} />
+          <p className="muted mt8" style={{ fontSize: 12 }}>{tr('켜면 내 운동 기록이 바뀔 때마다 투데이의 개발자의 볼륨이 갱신돼요')}</p>
+        </Card>
+
         <Card title={tr('닉네임')}>
           <div className="row gap8">
             <input className="input" value={nick} maxLength={12} onChange={(e) => setNick(e.target.value)} aria-label={tr('닉네임')} />
